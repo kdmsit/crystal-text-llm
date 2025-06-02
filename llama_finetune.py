@@ -264,7 +264,7 @@ def setup_training_args(args):
         eval_steps=args.eval_freq,
         save_steps=args.save_freq,
         logging_steps=10,
-        evaluation_strategy="steps",
+        evaluation_strategy="", #"steps",
         per_device_train_batch_size=args.batch_size,
         per_device_eval_batch_size=args.batch_size,
         learning_rate=args.lr,
