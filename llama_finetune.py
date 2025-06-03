@@ -18,20 +18,11 @@ from pathlib import Path
 
 from dataclasses import dataclass
 import transformers
-from transformers import ( 
-    LlamaForCausalLM,
-    LlamaTokenizer, 
-    Trainer, 
-    TrainingArguments
-)
+from transformers import LlamaForCausalLM, LlamaTokenizer, Trainer, TrainingArguments
 
 from torch.utils.data import Dataset
 
-from peft import (
-    LoraConfig, 
-    get_peft_model, 
-    prepare_model_for_kbit_training
-)
+from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
 
 IGNORE_INDEX = -100
 MAX_LENGTH = 2048
@@ -44,9 +35,7 @@ def get_crystal_string(cif_str):
     structure = Structure.from_str(cif_str, fmt="cif")
 
     # Randomly translate within the unit cell
-    structure.translate_sites(
-        indices=range(len(structure.sites)), vector=np.random.uniform(size=(3,))
-    )
+    structure.translate_sites(indices=range(len(structure.sites)), vector=np.random.uniform(size=(3,)))
 
     lengths = structure.lattice.parameters[:3]
     angles = structure.lattice.parameters[3:]
@@ -251,8 +240,8 @@ def setup_training_args(args):
     output_dir= args.expdir / args.run_name
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    if args.debug:
-        os.environ["WANDB_DISABLED"] = "True"
+    # if args.debug:
+    #     os.environ["WANDB_DISABLED"] = "True"
     os.environ["ACCELERATE_MIXED_PRECISION"] = "no"
     training_args = TrainingArguments(
         fsdp=False,
@@ -275,7 +264,7 @@ def setup_training_args(args):
         gradient_accumulation_steps=args.grad_accum,
         output_dir=output_dir,
         run_name=args.run_name,
-        report_to="wandb",
+        # report_to="wandb",
         dataloader_num_workers=8,
         remove_unused_columns=False,
         label_names=["crystal_ids"], #this is just to get trainer to behave how I want
