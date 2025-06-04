@@ -28,6 +28,10 @@ DEFAULT_EOS_TOKEN = "</s>"
 DEFAULT_BOS_TOKEN = "<s>"
 DEFAULT_UNK_TOKEN = "<unk>"
 
+from transformers import modeling_utils
+if not hasattr(modeling_utils, "ALL_PARALLEL_STYLES") or modeling_utils.ALL_PARALLEL_STYLES is None:
+    modeling_utils.ALL_PARALLEL_STYLES = ["tp", "none","colwise",'rowwise']
+
 def parse_fn(gen_str):
     lines = [x for x in gen_str.split("\n") if len(x) > 0]
     lengths = [float(x) for x in lines[0].split(" ")]
