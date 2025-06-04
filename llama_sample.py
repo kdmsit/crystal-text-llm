@@ -133,10 +133,7 @@ def unconditional_sample(args):
     while len(outputs) < args.num_samples:
         batch_prompts = prompts[len(outputs):len(outputs)+args.batch_size]
 
-        batch = tokenizer(
-            list(batch_prompts), 
-            return_tensors="pt",
-        )
+        batch = tokenizer(list(batch_prompts), return_tensors="pt")
         batch = {k: v.cuda() for k, v in batch.items()}
 
         generate_ids = model.generate(
