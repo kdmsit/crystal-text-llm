@@ -55,7 +55,7 @@ def prepare_model_and_tokenizer(args):
         return f"meta-llama/Llama-2-{model_size.lower()}-{chat}hf"
 
     model_string = llama2_model_string(model_size, is_chat)
-    
+    print(model_string)
     model = LlamaForCausalLM.from_pretrained(
         model_string,
         load_in_8bit=True,
