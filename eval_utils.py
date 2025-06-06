@@ -74,18 +74,7 @@ def get_crystals_list(frac_coords, atom_types, lengths, angles, num_atoms):
         angles: (num_crystals)
         num_atoms: (num_crystals)
     """
-    # print('frac coords',frac_coords.size())
-    # print('atom_types',atom_types.size())
-    # print('num_atoms',num_atoms.size())
-    # print('lengths',lengths.size())
-    # print('angles',angles.size())
-    #
-    print(frac_coords.size(0))
-    print(atom_types.size(0))
-    print(num_atoms.sum())
-
-    assert frac_coords.size(0) == atom_types.size(0) == num_atoms.sum()
-    assert lengths.size(0) == angles.size(0) == num_atoms.size(0)
+    
 
     start_idx = 0
     crystal_array_list = []
