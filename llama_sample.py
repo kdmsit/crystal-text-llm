@@ -128,7 +128,6 @@ def unconditional_sample(args):
     outputs = []
     n_atom, x_coord, a_type, length, angle = [], [], [], [], []
     while len(outputs) < args.num_samples:
-        print(len(outputs))
         batch_prompts = prompts[len(outputs):len(outputs)+args.batch_size]
 
         batch = tokenizer(list(batch_prompts), return_tensors="pt")
@@ -136,7 +135,6 @@ def unconditional_sample(args):
 
         generate_ids = model.generate(**batch, do_sample=True, max_new_tokens=500, temperature=args.temperature, top_p=args.top_p)
         gen_strs = tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)
-        batch_n, batch_x, batch_a, batch_len, batch_angle = [], [], [], [], []
         for gen_str, prompt in zip(gen_strs, batch_prompts):
             material_str = gen_str.replace(prompt, "")
 
@@ -153,28 +151,16 @@ def unconditional_sample(args):
             frac_coords, atom_types, lengths, angles, num_atoms = process_one(cif_str, True, False,
                                                                               'crystalnn', False, 0.01)
 
-            batch_n.append(frac_coords.shape[0])
-            batch_x.append(frac_coords)
-            batch_a.append(atom_types)
-            batch_len.append(lengths)
-            batch_angle.append(angles)
-        n_atom.append(torch.stack(batch_n, dim=0))
-        x_coord.append(torch.stack(batch_x, dim=0))
-        a_type.append(torch.stack(batch_a, dim=0))
-        length.append(torch.stack(batch_len, dim=0))
-        angle.append(torch.stack(batch_angle, dim=0))
-    n_atom = torch.cat(n_atom, dim=1)
-    x_coord = torch.cat(x_coord, dim=1)
-    a_type = torch.cat(a_type, dim=1)
-    length = torch.cat(length, dim=1)
-    angle = torch.cat(angle, dim=1)
-    print("n=>", n_atom.size())
-    print("x=>", x_coord.size())
-    print("a=>", a_type.size())
-    print("l=>", length.size())
-    print("a=>", angle.size())
-
-    n_atom, x_coord, a_type, length, angle = [], [], [], [], []
+            n_atom.append(frac_coords.shape[0])
+            x_coord.append(frac_coords)
+            a_type.append(atom_types)
+            length.append(lengths)
+            angle.append(angles)
+    print("n=>", len(n_atom))
+    print("x=>", len(x_coord))
+    print("a=>", len(a_type))
+    print("l=>", len(length))
+    print("a=>", len(angle))
 
     df = pd.DataFrame(outputs)
     df.to_csv(out_path, index=False)
