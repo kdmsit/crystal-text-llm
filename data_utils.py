@@ -21,7 +21,6 @@ from p_tqdm import p_umap
 
 from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 
-from pyxtal import pyxtal
 
 from pathos.pools import ProcessPool as Pool
 # from multiprocessing import Pool
@@ -129,45 +128,6 @@ def refine_spacegroup(crystal, tol=0.01):
         coords_are_cartesian=False,
     )
     return crystal, space_group
-
-
-def get_symmetry_info(crystal, tol=0.01):
-    spga = SpacegroupAnalyzer(crystal, symprec=tol)
-    crystal = spga.get_refined_structure()
-    c = pyxtal()
-    try:
-        c.from_seed(crystal, tol=0.01)
-    except:
-        c.from_seed(crystal, tol=0.0001)
-    space_group = c.group.number
-    species = []
-    anchors = []
-    matrices = []
-    coords = []
-    for site in c.atom_sites:
-        specie = site.specie
-        anchor = len(matrices)
-        coord = site.position
-        for syms in site.wp:
-            species.append(specie)
-            matrices.append(syms.affine_matrix)
-            coords.append(syms.operate(coord))
-            anchors.append(anchor)
-    anchors = np.array(anchors)
-    matrices = np.array(matrices)
-    coords = np.array(coords) % 1.
-    sym_info = {
-        'anchors':anchors,
-        'wyckoff_ops':matrices,
-        'spacegroup':space_group
-    }
-    crystal = Structure(
-        lattice=Lattice.from_parameters(*np.array(c.lattice.get_para(degree=True))),
-        species=species,
-        coords=coords,
-        coords_are_cartesian=False,
-    )
-    return crystal, sym_info
 
 def build_crystal_graph(crystal, graph_method='crystalnn'):
     """
@@ -1153,12 +1113,6 @@ def get_scaler_from_data_list(data_list, key):
 
 def process_one(crystal_str, niggli, primitive, graph_method, use_space_group = False, tol=0.01):
     crystal = build_crystal(crystal_str, niggli=niggli, primitive=primitive)
-    result_dict = {}
-    if use_space_group:
-        crystal, sym_info = get_symmetry_info(crystal, tol = tol)
-        result_dict.update(sym_info)
-    else:
-        result_dict['spacegroup'] = 1
     frac_coords, atom_types, lengths, angles, edge_indices, to_jimages, num_atoms = build_crystal_graph(crystal, graph_method)
     return frac_coords, atom_types, lengths, angles, num_atoms
 
