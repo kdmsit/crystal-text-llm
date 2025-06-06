@@ -171,9 +171,9 @@ def unconditional_sample(args):
 
     path = os.path.join("eval_recon.pt")
     torch.save({
-        "frac_coords": x,
-        "num_atoms": n,
-        "atom_types": a,
+        "frac_coords": x_coord,
+        "num_atoms": n_atom,
+        "atom_types": a_type,
         "lengths": length,
         "angles": angle,
     }, path)
