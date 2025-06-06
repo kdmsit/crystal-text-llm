@@ -152,7 +152,6 @@ def unconditional_sample(args):
 
             outputs.append({ "gen_str": gen_str, "cif": cif_str, "model_name": args.model_name })
 
-
             frac_coords = structure.frac_coords
             atom_types = structure.atomic_numbers
             atom_types = np.array(atom_types)
@@ -162,26 +161,25 @@ def unconditional_sample(args):
             angles = lattice_parameters[3:]
             lengths, angles = np.array(lengths), np.array(angles)
 
-            # Optional: print them
             print("Atom types:", atom_types.dtype)
             print("Number of atoms:", num_atoms.dtype)
             print("Fractional coordinates:\n", frac_coords.dtype)
             print("Lattice lengths (a, b, c):", lengths.dtype)
             print("Lattice angles (alpha, beta, gamma):", angles.dtype)
 
-            batch_n.append(num_atoms)
-            batch_x.append(x1)
-            batch_a.append(a1)
-            batch_l.append(l1)
-        n.append(torch.stack(batch_n, dim=0))
-        x.append(torch.stack(batch_x, dim=0))
-        a.append(torch.stack(batch_a, dim=0))
-        l.append(torch.stack(batch_l, dim=0))
-        input_data_list = input_data_list + batch.to_data_list()
-    n = torch.cat(n, dim=1)
-    x = torch.cat(x, dim=1)
-    a = torch.cat(a, dim=1)
-    l = torch.cat(l, dim=1)
+            # batch_n.append(num_atoms)
+            # batch_x.append(x1)
+            # batch_a.append(a1)
+            # batch_l.append(l1)
+    #     n.append(torch.stack(batch_n, dim=0))
+    #     x.append(torch.stack(batch_x, dim=0))
+    #     a.append(torch.stack(batch_a, dim=0))
+    #     l.append(torch.stack(batch_l, dim=0))
+    #     input_data_list = input_data_list + batch.to_data_list()
+    # n = torch.cat(n, dim=1)
+    # x = torch.cat(x, dim=1)
+    # a = torch.cat(a, dim=1)
+    # l = torch.cat(l, dim=1)
 
     df = pd.DataFrame(outputs)
     df.to_csv(out_path, index=False)
