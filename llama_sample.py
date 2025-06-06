@@ -128,7 +128,7 @@ def unconditional_sample(args):
         prompts.append(prompt)
  
     outputs = []
-    n, x, a, l = [], [], [], []
+    n_atom, x_coord, a_type, length, angle = [], [], [], [], []
     while len(outputs) < args.num_samples:
         batch_prompts = prompts[len(outputs):len(outputs)+args.batch_size]
 
@@ -137,7 +137,7 @@ def unconditional_sample(args):
 
         generate_ids = model.generate(**batch, do_sample=True, max_new_tokens=500, temperature=args.temperature, top_p=args.top_p)
         gen_strs = tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)
-        batch_n, batch_x, batch_a, batch_l = [], [], [], []
+        batch_n, batch_x, batch_a, batch_len, batch_angle = [], [], [], [], []
         for gen_str, prompt in zip(gen_strs, batch_prompts):
             material_str = gen_str.replace(prompt, "")
 
@@ -151,21 +151,27 @@ def unconditional_sample(args):
             outputs.append({ "gen_str": gen_str, "cif": cif_str, "model_name": args.model_name })
 
 
-            frac_coords, atom_types, lengths, angles, num_atoms = process_one(cif_str, True, False, 'crystalnn', False, 0.01)
+            frac_coords, atom_types, lengths, angles, num_atoms = process_one(cif_str, True, False,
+                                                                              'crystalnn', False, 0.01)
 
-            batch_n.append(batch.num_atoms.detach().cpu())
-            batch_x.append(x1.detach().cpu())
-            batch_a.append(a1.detach().cpu())
-            batch_l.append(l1.detach().cpu())
-        n.append(torch.stack(batch_n, dim=0))
-        x.append(torch.stack(batch_x, dim=0))
-        a.append(torch.stack(batch_a, dim=0))
-        l.append(torch.stack(batch_l, dim=0))
-        input_data_list = input_data_list + batch.to_data_list()
+            batch_n.append(num_atoms)
+            batch_x.append(frac_coords)
+            batch_a.append(atom_types)
+            batch_len.append(lengths)
+            batch_angle.append(angles)
+        n_atom.append(torch.stack(batch_n, dim=0))
+        x_coord.append(torch.stack(batch_x, dim=0))
+        a_type.append(torch.stack(batch_a, dim=0))
+        length.append(torch.stack(batch_len, dim=0))
+        angle.append(torch.stack(batch_angle, dim=0))
     n = torch.cat(n, dim=1)
     x = torch.cat(x, dim=1)
     a = torch.cat(a, dim=1)
     l = torch.cat(l, dim=1)
+    print("n=>", n.size())
+    print("x=>", x.size())
+    print("a=>", a.size())
+    print("l=>", l.size())
 
     df = pd.DataFrame(outputs)
     df.to_csv(out_path, index=False)
