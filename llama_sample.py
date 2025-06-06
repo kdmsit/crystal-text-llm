@@ -169,7 +169,7 @@ def unconditional_sample(args):
     print("l=>", length)
     print("a=>", angle)
 
-    path = os.path.join("eval_recon.pt")
+    path = os.path.join("eval_gen.pt")
     torch.save({
         "frac_coords": x_coord,
         "num_atoms": n_atom,
