@@ -152,7 +152,7 @@ def unconditional_sample(args):
             frac_coords, atom_types, lengths, angles, num_atoms = process_one(cif_str, True, False,
                                                                               'crystalnn', False, 0.01)
 
-            batch_n.append(num_atoms)
+            batch_n.append(frac_coords.shape[0])
             batch_x.append(frac_coords)
             batch_a.append(atom_types)
             batch_len.append(lengths)
@@ -162,14 +162,18 @@ def unconditional_sample(args):
         a_type.append(torch.stack(batch_a, dim=0))
         length.append(torch.stack(batch_len, dim=0))
         angle.append(torch.stack(batch_angle, dim=0))
-    n = torch.cat(n, dim=1)
-    x = torch.cat(x, dim=1)
-    a = torch.cat(a, dim=1)
-    l = torch.cat(l, dim=1)
-    print("n=>", n.size())
-    print("x=>", x.size())
-    print("a=>", a.size())
-    print("l=>", l.size())
+    n_atom = torch.cat(n_atom, dim=1)
+    x_coord = torch.cat(x_coord, dim=1)
+    a_type = torch.cat(a_type, dim=1)
+    length = torch.cat(length, dim=1)
+    angle = torch.cat(angle, dim=1)
+    print("n=>", n_atom.size())
+    print("x=>", x_coord.size())
+    print("a=>", a_type.size())
+    print("l=>", length.size())
+    print("a=>", angle.size())
+
+    n_atom, x_coord, a_type, length, angle = [], [], [], [], []
 
     df = pd.DataFrame(outputs)
     df.to_csv(out_path, index=False)
