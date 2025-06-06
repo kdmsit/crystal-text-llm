@@ -10,10 +10,8 @@ import random
 import argparse
 import pandas as pd
 import numpy as np
-
-from transformers import (
-    LlamaForCausalLM, LlamaTokenizer
-)
+import torch
+from transformers import LlamaForCausalLM, LlamaTokenizer
 from peft import PeftModel
 from pymatgen.core import Structure
 from pymatgen.core.lattice import Lattice
