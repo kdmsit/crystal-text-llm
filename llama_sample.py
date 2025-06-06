@@ -169,8 +169,16 @@ def unconditional_sample(args):
     print("l=>", length)
     print("a=>", angle)
 
-    df = pd.DataFrame(outputs)
-    df.to_csv(out_path, index=False)
+    path = os.path.join("eval_recon.pt")
+    torch.save({
+        "frac_coords": x,
+        "num_atoms": n,
+        "atom_types": a,
+        "lengths": length,
+        "angles": angle,
+    }, path)
+    print("Saved to file")
+
 
 condition_templates = {
     "pretty_formula": "The chemical formula is {pretty_formula}. ",
