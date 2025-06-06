@@ -130,62 +130,41 @@ def unconditional_sample(args):
         prompts.append(prompt)
  
     outputs = []
-    n, x, a, l = [], [], [], []
     while len(outputs) < args.num_samples:
         batch_prompts = prompts[len(outputs):len(outputs)+args.batch_size]
 
         batch = tokenizer(list(batch_prompts), return_tensors="pt")
         batch = {k: v.cuda() for k, v in batch.items()}
 
-        generate_ids = model.generate(**batch, do_sample=True, max_new_tokens=500, temperature=args.temperature, top_p=args.top_p)
-        gen_strs = tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)
-        batch_n, batch_x, batch_a, batch_l = [], [], [], []
+        generate_ids = model.generate(
+            **batch,
+            do_sample=True,
+            max_new_tokens=500,
+            temperature=args.temperature, 
+            top_p=args.top_p, 
+        )
+
+        gen_strs = tokenizer.batch_decode(
+            generate_ids, 
+            skip_special_tokens=True, 
+            clean_up_tokenization_spaces=False
+        )
+
         for gen_str, prompt in zip(gen_strs, batch_prompts):
             material_str = gen_str.replace(prompt, "")
 
             try:
                 cif_str = parse_fn(material_str)
-                structure = Structure.from_str(cif_str, fmt="cif")
+                _ = Structure.from_str(cif_str, fmt="cif")
             except Exception as e:
                 print(e)
                 continue
 
-            outputs.append({ "gen_str": gen_str, "cif": cif_str, "model_name": args.model_name })
-
-            # Atom types
-            atom_types = structure.species  # or structure.elements for element types only
-
-            # Number of atoms
-            num_atoms = len(structure)
-
-            # Fractional coordinates
-            frac_coords = structure.frac_coords  # numpy array of shape (num_atoms, 3)
-
-            # Lattice lengths and angles
-            lattice = structure.lattice
-            lattice_lengths = lattice.abc  # (a, b, c)
-            lattice_angles = lattice.angles  # (alpha, beta, gamma)
-
-            # Optional: print them
-            print("Atom types:", atom_types)
-            print("Number of atoms:", num_atoms)
-            print("Fractional coordinates:\n", frac_coords)
-            print("Lattice lengths (a, b, c):", lattice_lengths)
-            print("Lattice angles (alpha, beta, gamma):", lattice_angles)
-
-            batch_n.append(num_atoms.detach().cpu())
-            batch_x.append(x1.detach().cpu())
-            batch_a.append(a1.detach().cpu())
-            batch_l.append(l1.detach().cpu())
-        n.append(torch.stack(batch_n, dim=0))
-        x.append(torch.stack(batch_x, dim=0))
-        a.append(torch.stack(batch_a, dim=0))
-        l.append(torch.stack(batch_l, dim=0))
-        input_data_list = input_data_list + batch.to_data_list()
-    n = torch.cat(n, dim=1)
-    x = torch.cat(x, dim=1)
-    a = torch.cat(a, dim=1)
-    l = torch.cat(l, dim=1)
+            outputs.append({
+                "gen_str": gen_str,
+                "cif": cif_str,
+                "model_name": args.model_name,
+            })
 
     df = pd.DataFrame(outputs)
     df.to_csv(out_path, index=False)
