@@ -261,6 +261,7 @@ def get_crystal_array_list(file_path, batch_idx=0):
     data = load_data(file_path)
     batch_size = len(data['frac_coords'])
     print(batch_size)
+    print(data)
     for i in range(batch_size):
         tmp_crys_array_list = get_crystals_list(
             data['frac_coords'][i],
