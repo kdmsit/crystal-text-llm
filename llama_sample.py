@@ -152,26 +152,19 @@ def unconditional_sample(args):
 
             outputs.append({ "gen_str": gen_str, "cif": cif_str, "model_name": args.model_name })
 
-            # Atom types
-            atom_types = structure.species  # or structure.elements for element types only
-
-            # Number of atoms
             num_atoms = len(structure)
-
-            # Fractional coordinates
-            frac_coords = structure.frac_coords  # numpy array of shape (num_atoms, 3)
-
-            # Lattice lengths and angles
-            lattice = structure.lattice
-            lattice_lengths = lattice.abc  # (a, b, c)
-            lattice_angles = lattice.angles  # (alpha, beta, gamma)
+            frac_coords = structure.frac_coords
+            atom_types = structure.atomic_numbers
+            lattice_parameters = structure.lattice.parameters
+            lengths = lattice_parameters[:3]
+            angles = lattice_parameters[3:]
 
             # Optional: print them
             print("Atom types:", atom_types)
             print("Number of atoms:", num_atoms)
             print("Fractional coordinates:\n", frac_coords)
-            print("Lattice lengths (a, b, c):", lattice_lengths)
-            print("Lattice angles (alpha, beta, gamma):", lattice_angles)
+            print("Lattice lengths (a, b, c):", lengths)
+            print("Lattice angles (alpha, beta, gamma):", angles)
 
             batch_n.append(num_atoms.detach().cpu())
             batch_x.append(x1.detach().cpu())
