@@ -152,12 +152,15 @@ def unconditional_sample(args):
 
             outputs.append({ "gen_str": gen_str, "cif": cif_str, "model_name": args.model_name })
 
-            num_atoms = len(structure)
+
             frac_coords = structure.frac_coords
             atom_types = structure.atomic_numbers
+            atom_types = np.array(atom_types)
+            num_atoms = atom_types.shape[0]
             lattice_parameters = structure.lattice.parameters
             lengths = lattice_parameters[:3]
             angles = lattice_parameters[3:]
+            lengths, angles = np.array(lengths), np.array(angles)
 
             # Optional: print them
             print("Atom types:", atom_types.dtype)
@@ -166,10 +169,10 @@ def unconditional_sample(args):
             print("Lattice lengths (a, b, c):", lengths.dtype)
             print("Lattice angles (alpha, beta, gamma):", angles.dtype)
 
-            batch_n.append(num_atoms.detach().cpu())
-            batch_x.append(x1.detach().cpu())
-            batch_a.append(a1.detach().cpu())
-            batch_l.append(l1.detach().cpu())
+            batch_n.append(num_atoms)
+            batch_x.append(x1)
+            batch_a.append(a1)
+            batch_l.append(l1)
         n.append(torch.stack(batch_n, dim=0))
         x.append(torch.stack(batch_x, dim=0))
         a.append(torch.stack(batch_a, dim=0))
