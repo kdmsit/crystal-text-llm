@@ -257,15 +257,6 @@ class GenEval(object):
         return metrics
 
 
-def get_file_paths(root_path, task, label='', suffix='pt'):
-    if label == '':
-        out_name = f'eval_{task}.{suffix}'
-    else:
-        out_name = f'eval_{task}_{label}.{suffix}'
-    out_name = os.path.join(root_path, out_name)
-    return out_name
-
-
 def get_crystal_array_list(file_path, batch_idx=0):
     data = load_data(file_path)
     batch_size = len(data['frac_coords'])
@@ -298,16 +289,14 @@ def task(x):
 
 def main(args):
     all_metrics = {}
-    dataset = args.root_path.split('/')[1]
+    dataset = "mp_20"
     print(dataset)
     eval_model_name = dataset
 
     out = open("result.txt", "a")
 
     if 'gen' in args.tasks:
-        gen_file_path = get_file_paths("eval_gen.pt", 'gen', args.label)
-        print(gen_file_path)
-        crys_array_list = get_crystal_array_list(gen_file_path,0)
+        crys_array_list = get_crystal_array_list("eval_gen.pt",0)
 
 
         gen_crys = p_map(lambda x: Crystal(x), crys_array_list)
@@ -341,7 +330,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--root_path', required=True)
+    # parser.add_argument('--root_path', required=True)
     parser.add_argument('--label', default='')
     parser.add_argument('--tasks', nargs='+', default=['recon', 'gen', 'opt'])
     parser.add_argument('--multi_eval', action='store_true')
