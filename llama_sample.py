@@ -17,11 +17,9 @@ from transformers import (
 from peft import PeftModel
 from pymatgen.core import Structure
 from pymatgen.core.lattice import Lattice
-from llama_finetune import (
-    get_crystal_string,   
-    MAX_LENGTH
-)
+from llama_finetune import get_crystal_string, MAX_LENGTH
 from templating import make_swap_table
+from .data_utils import process_one
 
 DEFAULT_PAD_TOKEN = "[PAD]"
 DEFAULT_EOS_TOKEN = "</s>"
@@ -153,19 +151,13 @@ def unconditional_sample(args):
             outputs.append({ "gen_str": gen_str, "cif": cif_str, "model_name": args.model_name })
 
 
-            atom_types = structure.atomic_numbers
-            atom_types = np.array(atom_types)
-            num_atoms = atom_types.shape[0]
-            frac_coords = structure.frac_coords
-            lattice_parameters = structure.lattice.parameters
-            lengths = lattice_parameters[:3]
-            angles = lattice_parameters[3:]
-            lengths, angles = np.array(lengths), np.array(angles)
+            frac_coords, atom_types, lengths, angles, num_atoms = process_one(cif_str, True, False, 'crystalnn', False, 0.01)
 
             print("Atom types:", atom_types.dtype)
             print("Fractional coordinates:\n", frac_coords.dtype)
             print("Lattice lengths (a, b, c):", lengths.dtype)
             print("Lattice angles (alpha, beta, gamma):", angles.dtype)
+            print("Num Atoms:", num_atoms.dtype)
 
             # batch_n.append(num_atoms)
             # batch_x.append(x1)
