@@ -160,11 +160,11 @@ def unconditional_sample(args):
             angles = lattice_parameters[3:]
 
             # Optional: print them
-            print("Atom types:", atom_types)
-            print("Number of atoms:", num_atoms)
-            print("Fractional coordinates:\n", frac_coords)
-            print("Lattice lengths (a, b, c):", lengths)
-            print("Lattice angles (alpha, beta, gamma):", angles)
+            print("Atom types:", atom_types.dtype)
+            print("Number of atoms:", num_atoms.dtype)
+            print("Fractional coordinates:\n", frac_coords.dtype)
+            print("Lattice lengths (a, b, c):", lengths.dtype)
+            print("Lattice angles (alpha, beta, gamma):", angles.dtype)
 
             batch_n.append(num_atoms.detach().cpu())
             batch_x.append(x1.detach().cpu())
