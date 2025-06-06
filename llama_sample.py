@@ -19,7 +19,7 @@ from pymatgen.core import Structure
 from pymatgen.core.lattice import Lattice
 from llama_finetune import get_crystal_string, MAX_LENGTH
 from templating import make_swap_table
-from .data_utils import process_one
+from data_utils import process_one
 
 DEFAULT_PAD_TOKEN = "[PAD]"
 DEFAULT_EOS_TOKEN = "</s>"
