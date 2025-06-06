@@ -128,6 +128,7 @@ def unconditional_sample(args):
     outputs = []
     n_atom, x_coord, a_type, length, angle = [], [], [], [], []
     while len(outputs) < args.num_samples:
+        print(len(outputs))
         batch_prompts = prompts[len(outputs):len(outputs)+args.batch_size]
 
         batch = tokenizer(list(batch_prompts), return_tensors="pt")
