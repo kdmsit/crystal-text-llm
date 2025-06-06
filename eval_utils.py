@@ -80,9 +80,9 @@ def get_crystals_list(frac_coords, atom_types, lengths, angles, num_atoms):
     # print('lengths',lengths.size())
     # print('angles',angles.size())
     #
-    # print(frac_coords.size(0))
-    # print(atom_types.size(0))
-    # print(num_atoms.sum())
+    print(frac_coords.size(0))
+    print(atom_types.size(0))
+    print(num_atoms.sum())
 
     assert frac_coords.size(0) == atom_types.size(0) == num_atoms.sum()
     assert lengths.size(0) == angles.size(0) == num_atoms.size(0)
