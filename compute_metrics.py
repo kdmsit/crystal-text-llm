@@ -115,6 +115,7 @@ class GenEval(object):
         self.eval_model_name = eval_model_name
 
         valid_crys = [c for c in pred_crys if c.valid]
+        self.valid_samples = valid_crys
 
         # if len(valid_crys) >= n_samples:
         #     sampled_indices = np.random.choice(len(valid_crys), n_samples, replace=False)
@@ -130,43 +131,43 @@ class GenEval(object):
                 'struct_valid': struct_valid,
                 'valid': valid}
 
-    # def get_comp_diversity(self):
-    #     comp_fps = [c.comp_fp for c in self.valid_samples]
-    #     comp_fps = CompScaler.transform(comp_fps)
-    #     comp_div = get_fp_pdist(comp_fps)
-    #     return {'comp_div': comp_div}
-    #
-    # def get_struct_diversity(self):
-    #     return {'struct_div': get_fp_pdist([c.struct_fp for c in self.valid_samples])}
-    #
-    # def get_density_wdist(self):
-    #     pred_densities = [c.structure.density for c in self.valid_samples]
-    #     gt_densities = [c.structure.density for c in self.gt_crys]
-    #     wdist_density = wasserstein_distance(pred_densities, gt_densities)
-    #     return {'wdist_density': wdist_density}
-    #
-    # def get_num_elem_wdist(self):
-    #     pred_nelems = [len(set(c.structure.species)) for c in self.valid_samples]
-    #     gt_nelems = [len(set(c.structure.species)) for c in self.gt_crys]
-    #     wdist_num_elems = wasserstein_distance(pred_nelems, gt_nelems)
-    #     return {'wdist_num_elems': wdist_num_elems}
-    #
-    # def get_coverage(self):
-    #     cutoff_dict = COV_Cutoffs[self.eval_model_name]
-    #     (cov_metrics_dict, combined_dist_dict) = compute_cov(
-    #         self.crys, self.gt_crys,
-    #         struc_cutoff=cutoff_dict['struc'],
-    #         comp_cutoff=cutoff_dict['comp'])
-    #     return cov_metrics_dict
+    def get_comp_diversity(self):
+        comp_fps = [c.comp_fp for c in self.valid_samples]
+        comp_fps = CompScaler.transform(comp_fps)
+        comp_div = get_fp_pdist(comp_fps)
+        return {'comp_div': comp_div}
+
+    def get_struct_diversity(self):
+        return {'struct_div': get_fp_pdist([c.struct_fp for c in self.valid_samples])}
+
+    def get_density_wdist(self):
+        pred_densities = [c.structure.density for c in self.valid_samples]
+        gt_densities = [c.structure.density for c in self.gt_crys]
+        wdist_density = wasserstein_distance(pred_densities, gt_densities)
+        return {'wdist_density': wdist_density}
+
+    def get_num_elem_wdist(self):
+        pred_nelems = [len(set(c.structure.species)) for c in self.valid_samples]
+        gt_nelems = [len(set(c.structure.species)) for c in self.gt_crys]
+        wdist_num_elems = wasserstein_distance(pred_nelems, gt_nelems)
+        return {'wdist_num_elems': wdist_num_elems}
+
+    def get_coverage(self):
+        cutoff_dict = COV_Cutoffs[self.eval_model_name]
+        (cov_metrics_dict, combined_dist_dict) = compute_cov(
+            self.crys, self.gt_crys,
+            struc_cutoff=cutoff_dict['struc'],
+            comp_cutoff=cutoff_dict['comp'])
+        return cov_metrics_dict
 
     def get_metrics(self):
         metrics = {}
         metrics.update(self.get_validity())
-        # metrics.update(self.get_comp_diversity())
-        # metrics.update(self.get_struct_diversity())
-        # metrics.update(self.get_density_wdist())
-        # metrics.update(self.get_num_elem_wdist())
-        # metrics.update(self.get_coverage())
+        metrics.update(self.get_comp_diversity())
+        metrics.update(self.get_struct_diversity())
+        metrics.update(self.get_density_wdist())
+        metrics.update(self.get_num_elem_wdist())
+        metrics.update(self.get_coverage())
         return metrics
 
 
