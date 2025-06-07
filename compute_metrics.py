@@ -183,10 +183,10 @@ def get_crystal_array_list(file_path, batch_idx=0):
         lengths = data['lengths'][batch_idx]
         angles = data['angles'][batch_idx]
         crystal_array_list.append({
-            'frac_coords': frac_coords.numpy(),
-            'atom_types': atom_types.numpy(),
-            'lengths': lengths.numpy(),
-            'angles': angles.numpy(),
+            'frac_coords': frac_coords,
+            'atom_types': atom_types,
+            'lengths': lengths,
+            'angles': angles,
         })
     return crys_array_list
 
