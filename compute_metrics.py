@@ -176,31 +176,18 @@ def get_crystal_array_list(file_path, batch_idx=0):
     data = load_data(file_path)
     batch_size = len(data['frac_coords'])
     print(batch_size)
-    print(data['frac_coords'])
-    print(data['num_atoms'])
-
-    frac_coords = data['frac_coords']
-    atom_types = data['atom_types']
-    lengths = data['lengths']
-    angles = data['angles']
-    num_atoms = data['num_atoms']
-
-
     crystal_array_list = []
-    start_idx = 0
-    for batch_idx, num_atom in enumerate(num_atoms):
-        cur_frac_coords = frac_coords.narrow(0, start_idx, num_atom)
-        cur_atom_types = atom_types.narrow(0, start_idx, num_atom)
-        cur_lengths = lengths[batch_idx]
-        cur_angles = angles[batch_idx]
-
+    for batch_idx in range(batch_size):
+        frac_coords = data['frac_coords'][batch_idx]
+        atom_types = data['atom_types'][batch_idx]
+        lengths = data['lengths'][batch_idx]
+        angles = data['angles'][batch_idx]
         crystal_array_list.append({
-            'frac_coords': cur_frac_coords.numpy(),
-            'atom_types': cur_atom_types.numpy(),
-            'lengths': cur_lengths.numpy(),
-            'angles': cur_angles.numpy(),
+            'frac_coords': frac_coords.numpy(),
+            'atom_types': atom_types.numpy(),
+            'lengths': lengths.numpy(),
+            'angles': angles.numpy(),
         })
-        start_idx = start_idx + num_atom
     return crys_array_list
 
 def get_gt_crys_ori(cif):
