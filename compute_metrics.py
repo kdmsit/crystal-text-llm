@@ -188,7 +188,7 @@ def get_crystal_array_list(file_path, batch_idx=0):
             'lengths': lengths,
             'angles': angles,
         })
-    return crys_array_list
+    return crystal_array_list
 
 def get_gt_crys_ori(cif):
     structure = Structure.from_str(cif,fmt='cif')
