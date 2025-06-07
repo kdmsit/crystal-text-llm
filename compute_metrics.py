@@ -176,8 +176,8 @@ def get_crystal_array_list(file_path, batch_idx=0):
     data = load_data(file_path)
     batch_size = len(data['frac_coords'])
     print(batch_size)
-    print(data['frac_coords'])
-    
+    print(data['num_atoms'])
+
     frac_coords = data['frac_coords'][0]
     atom_types = data['atom_types'][0]
     lengths = data['lengths'][0]
