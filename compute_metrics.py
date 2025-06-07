@@ -46,10 +46,6 @@ class Crystal(object):
         self.atom_types = crys_array_dict['atom_types']
         self.lengths = crys_array_dict['lengths']
         self.angles = crys_array_dict['angles']
-        # print(self.frac_coords)
-        # print(self.atom_types)
-        # print(self.lengths)
-        # print(self.angles)
         self.dict = crys_array_dict
 
         self.get_structure()
@@ -109,87 +105,6 @@ class Crystal(object):
             self.struct_fp = None
             return
         self.struct_fp = np.array(site_fps).mean(axis=0)
-
-
-class RecEval(object):
-
-    def __init__(self, pred_crys, gt_crys, stol=0.5, angle_tol=10, ltol=0.3):
-        assert len(pred_crys) == len(gt_crys)
-        self.matcher = StructureMatcher(
-            stol=stol, angle_tol=angle_tol, ltol=ltol)
-        self.preds = pred_crys
-        self.gts = gt_crys
-
-    def get_match_rate_and_rms(self):
-        def process_one(pred, gt, is_valid):
-            if not is_valid:
-                return None
-            try:
-                rms_dist = self.matcher.get_rms_dist(
-                    pred.structure, gt.structure)
-                rms_dist = None if rms_dist is None else rms_dist[0]
-                return rms_dist
-            except Exception:
-                return None
-        validity = [c.valid for c in self.preds]
-
-        rms_dists = []
-        for i in tqdm(range(len(self.preds))):
-            rms_dists.append(process_one(self.preds[i], self.gts[i], validity[i]))
-        rms_dists = np.array(rms_dists)
-        match_rate = sum(rms_dists != None) / len(self.preds)
-        mean_rms_dist = rms_dists[rms_dists != None].mean()
-        return {'match_rate': match_rate,
-                'rms_dist': mean_rms_dist}
-
-    def get_metrics(self):
-        return self.get_match_rate_and_rms()
-
-
-class RecEvalBatch(object):
-
-    def __init__(self, pred_crys, gt_crys, stol=0.5, angle_tol=10, ltol=0.3):
-        self.matcher = StructureMatcher(stol=stol, angle_tol=angle_tol, ltol=ltol)
-        self.preds = pred_crys
-        self.gts = gt_crys
-        self.batch_size = len(self.preds)
-
-    def get_match_rate_and_rms(self):
-        def process_one(pred, gt, is_valid):
-            if not is_valid:
-                return None
-            try:
-                rms_dist = self.matcher.get_rms_dist(
-                    pred.structure, gt.structure)
-                rms_dist = None if rms_dist is None else rms_dist[0]
-                return rms_dist
-            except Exception:
-                return None
-
-        rms_dists = []
-        self.all_rms_dis = np.zeros((self.batch_size, len(self.gts)))
-        for i in tqdm(range(len(self.preds[0]))):
-            tmp_rms_dists = []
-            for j in range(self.batch_size):
-                rmsd = process_one(self.preds[j][i], self.gts[i], self.preds[j][i].valid)
-                self.all_rms_dis[j][i] = rmsd
-                if rmsd is not None:
-                    tmp_rms_dists.append(rmsd)
-            if len(tmp_rms_dists) == 0:
-                rms_dists.append(None)
-            else:
-                rms_dists.append(np.min(tmp_rms_dists))
-
-        rms_dists = np.array(rms_dists)
-        match_rate = sum(rms_dists != None) / len(self.preds[0])
-        mean_rms_dist = rms_dists[rms_dists != None].mean()
-        return {'match_rate': match_rate,
-                'rms_dist': mean_rms_dist}
-
-    def get_metrics(self):
-        metrics = {}
-        metrics.update(self.get_match_rate_and_rms())
-        return metrics
 
 class GenEval(object):
 
@@ -262,14 +177,21 @@ def get_crystal_array_list(file_path, batch_idx=0):
     batch_size = len(data['frac_coords'])
     print(batch_size)
     print(len(data['frac_coords']))
-    for i in range(batch_size):
-        tmp_crys_array_list = get_crystals_list(
-            data['frac_coords'][i],
-            data['atom_types'][i],
-            data['lengths'][i],
-            data['angles'][i],
-            data['num_atoms'][i])
-        crys_array_list.append(tmp_crys_array_list)
+    crystal_array_list = []
+    start_idx = 0
+    for batch_idx, num_atom in enumerate(num_atoms.tolist()):
+        cur_frac_coords = frac_coords.narrow(0, start_idx, num_atom)
+        cur_atom_types = atom_types.narrow(0, start_idx, num_atom)
+        cur_lengths = lengths[batch_idx]
+        cur_angles = angles[batch_idx]
+
+        crystal_array_list.append({
+            'frac_coords': cur_frac_coords.numpy(),
+            'atom_types': cur_atom_types.numpy(),
+            'lengths': cur_lengths.numpy(),
+            'angles': cur_angles.numpy(),
+        })
+        start_idx = start_idx + num_atom
     return crys_array_list
 
 def get_gt_crys_ori(cif):

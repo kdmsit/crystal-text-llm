@@ -74,7 +74,7 @@ def get_crystals_list(frac_coords, atom_types, lengths, angles, num_atoms):
         angles: (num_crystals)
         num_atoms: (num_crystals)
     """
-    
+
 
     start_idx = 0
     crystal_array_list = []
