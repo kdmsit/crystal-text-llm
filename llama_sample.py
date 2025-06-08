@@ -160,13 +160,13 @@ def unconditional_sample(args):
 
 
 
-    n_atom.append(torch.stack(num_atoms, dim=0))
+    # n_atom.append(torch.stack(num_atoms, dim=0))
     x_coord.append(torch.stack(frac_coords, dim=0))
     a_type.append(torch.stack(atom_types, dim=0))
     length.append(torch.stack(lengths, dim=0))
     angle.append(torch.stack(angles, dim=0))
 
-    n_atom = torch.cat(n_atom, dim=1)
+    # n_atom = torch.cat(n_atom, dim=1)
     x_coord = torch.cat(x_coord, dim=1)
     a_type = torch.cat(a_type, dim=1)
     length = torch.cat(length, dim=1)
