@@ -152,12 +152,14 @@ def unconditional_sample(args):
             frac_coords, atom_types, lengths, angles, num_atoms = process_one(cif_str, True, False,
                                                                               'crystalnn', False, 0.01)
 
+            num_atoms = torch.tensor(num_atoms)
             frac_coords = torch.tensor(frac_coords)
             atom_types = torch.tensor(atom_types)
             lengths = torch.tensor(lengths)
             angles = torch.tensor(angles)
 
-            print(frac_coords.size(0))
+            print(num_atoms.size())
+            print(frac_coords.size())
             print(atom_types.size())
             print(lengths.size())
             print(angles.size())
