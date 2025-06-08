@@ -157,7 +157,7 @@ def unconditional_sample(args):
             lengths = torch.tensor(lengths)
             angles = torch.tensor(angles)
 
-            print(frac_coords.size())
+            print(frac_coords.size(0))
             print(atom_types.size())
             print(lengths.size())
             print(angles.size())
