@@ -177,11 +177,11 @@ def unconditional_sample(args):
     length = torch.cat(length, dim=0)
     angle = torch.cat(angle, dim=0)
 
-    print(num_atoms.size())
-    print(frac_coords.size())
-    print(atom_types.size())
-    print(lengths.size())
-    print(angles.size())
+    print(n_atom.size())
+    print(x_coord.size())
+    print(a_type.size())
+    print(length.size())
+    print(angle.size())
 
     path = os.path.join("eval_gen.pt")
     torch.save({
