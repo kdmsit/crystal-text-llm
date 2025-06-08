@@ -158,28 +158,25 @@ def unconditional_sample(args):
             lengths = torch.tensor(lengths)
             angles = torch.tensor(angles)
 
-            print(num_atoms.size())
-            print(frac_coords.size())
-            print(atom_types.size())
-            print(lengths.size())
-            print(angles.size())
 
-            n_atom.append(frac_coords.shape[0])
+
+            n_atom.append(num_atoms)
             x_coord.append(frac_coords)
             a_type.append(atom_types)
             length.append(lengths)
             angle.append(angles)
-    # print("n=>", len(n_atom))
-    # print("x=>", len(x_coord))
-    # print("a=>", len(a_type))
-    # print("l=>", len(length))
-    # print("a=>", len(angle))
+    
+    n_atom = torch.cat(n_atom, dim=1)
+    x_coord = torch.cat(x_coord, dim=1)
+    a_type = torch.cat(a_type, dim=1)
+    length = torch.cat(length, dim=1)
+    angle = torch.cat(angle, dim=1)
 
-    print("n=>", n_atom)
-    print("x=>", x_coord)
-    print("a=>", a_type)
-    print("l=>", length)
-    print("a=>", angle)
+    print(num_atoms.size())
+    print(frac_coords.size())
+    print(atom_types.size())
+    print(lengths.size())
+    print(angles.size())
 
     path = os.path.join("eval_gen.pt")
     torch.save({
