@@ -176,6 +176,12 @@ def unconditional_sample(args):
     length = torch.cat(length, dim=0)
     angle = torch.cat(angle, dim=0)
 
+    n_atom = n_atom.unsqueeze(0)
+    x_coord = x_coord.unsqueeze(0)
+    a_type = a_type.unsqueeze(0)
+    length = length.unsqueeze(0)
+    angle = angle.unsqueeze(0)
+
     print(n_atom.size())
     print(x_coord.size())
     print(a_type.size())
