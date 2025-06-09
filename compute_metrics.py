@@ -73,9 +73,9 @@ class Crystal(object):
             except Exception:
                 self.constructed = False
                 self.invalid_reason = 'construction_raises_exception'
-            if self.structure.volume < 0.1:
-                self.constructed = False
-                self.invalid_reason = 'unrealistically_small_lattice'
+                # if self.structure.volume < 0.1:
+                #     self.constructed = False
+                #     self.invalid_reason = 'unrealistically_small_lattice'
 
     def get_composition(self):
         elem_counter = Counter(self.atom_types)
