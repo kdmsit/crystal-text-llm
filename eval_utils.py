@@ -105,10 +105,11 @@ def get_crystals_list(frac_coords, atom_types, lengths, angles, num_atoms):
     return crystal_array_list
 
 
-def smact_validity(comp, count,
-                   use_pauling_test=True,
-                   include_alloys=True):
-    elem_symbols = tuple([chemical_symbols[elem] for elem in comp])
+def smact_validity(comp, count,use_pauling_test=True,include_alloys=True):
+    try:
+        elem_symbols = tuple([chemical_symbols[elem] for elem in comp])
+    except Exception:
+        print(comp)
     space = smact.element_dictionary(elem_symbols)
     smact_elems = [e[1] for e in space.items()]
     electronegs = [e.pauling_eneg for e in smact_elems]

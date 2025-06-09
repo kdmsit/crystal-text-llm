@@ -100,8 +100,7 @@ class Crystal(object):
         comp = Composition(elem_counter)
         self.comp_fp = CompFP.featurize(comp)
         try:
-            site_fps = [CrystalNNFP.featurize(
-                self.structure, i) for i in range(len(self.structure))]
+            site_fps = [CrystalNNFP.featurize(self.structure, i) for i in range(len(self.structure))]
         except Exception:
             # counts crystal as invalid if fingerprint cannot be constructed.
             self.valid = False
