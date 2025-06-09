@@ -18,7 +18,7 @@ from pymatgen.core.lattice import Lattice
 from llama_finetune import get_crystal_string, MAX_LENGTH
 from templating import make_swap_table
 from data_utils import process_one
-
+from tqdm import tqdm
 DEFAULT_PAD_TOKEN = "[PAD]"
 DEFAULT_EOS_TOKEN = "</s>"
 DEFAULT_BOS_TOKEN = "<s>"
@@ -124,9 +124,11 @@ def unconditional_sample(args):
             "and then the element type and coordinates for each atom within the lattice:\n"
         )
         prompts.append(prompt)
- 
+
     outputs = []
     n_atom, x_coord, a_type, length, angle = [], [], [], [], []
+    pbar = tqdm(total=args.num_samples, desc="Generating Samples")
+
     while len(outputs) < args.num_samples:
         print(len(outputs))
         batch_prompts = prompts[len(outputs):len(outputs)+args.batch_size]
@@ -162,6 +164,7 @@ def unconditional_sample(args):
             a_type.append(atom_types)
             length.append(lengths.view(1, 3))
             angle.append(angles.view(1, 3))
+        pbar.update(1)
 
 
     # n_atom.append(torch.stack(num_atoms, dim=0))
