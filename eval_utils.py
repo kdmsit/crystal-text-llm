@@ -107,11 +107,13 @@ def get_crystals_list(frac_coords, atom_types, lengths, angles, num_atoms):
 
 def smact_validity(comp, count,use_pauling_test=True,include_alloys=True):
     s=[]
-    try:
-        for elem in comp:
-            s.append(chemical_symbols[elem])
-    except Exception:
-        print(comp)
+
+    for elem in comp:
+        try:
+            chem_symbol = chemical_symbols[elem]
+            s.append(chem_symbol)
+        except Exception:
+            continue
     elem_symbols = tuple(s)
     # try:
     #     elem_symbols = tuple([chemical_symbols[elem] for elem in comp])
