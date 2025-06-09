@@ -294,9 +294,9 @@ def task(x):
 
 def main(args):
     all_metrics = {}
-    dataset = args.root_path.split('/')[1]
-    print(dataset)
-    eval_model_name = dataset
+    # dataset = args.root_path.split('/')[1]
+    # print(dataset)
+    eval_model_name = 'mp_20'
 
     out = open("result.txt", "a")
 
