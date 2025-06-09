@@ -9,8 +9,8 @@ from pathlib import Path
 import smact
 from smact.screening import pauling_test
 
-from models_ddpm.constants import CompScalerMeans, CompScalerStds
-from models_ddpm.data_utils import StandardScaler
+from constants import CompScalerMeans, CompScalerStds
+from data_utils import StandardScaler
 # from pl_data.dataset import TensorCrystDataset
 # from pl_data.datamodule import worker_init_fn
 
