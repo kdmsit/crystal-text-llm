@@ -21,7 +21,6 @@ import time
 
 from eval_utils import (smact_validity, structure_validity, CompScaler, get_fp_pdist, load_data, get_crystals_list, compute_cov)
 
-from models_ddpm.utils import cif2png
 
 CrystalNNFP = CrystalNNFingerprint.from_preset("ops")
 CompFP = ElementProperty.from_preset('magpie')
