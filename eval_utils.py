@@ -1,16 +1,19 @@
 import itertools
 import numpy as np
 import torch
+import hydra
 import os
 from scipy.spatial.distance import pdist
 from scipy.spatial.distance import cdist
+from hydra.experimental import compose
+from hydra import initialize_config_dir
 from pathlib import Path
 
 import smact
 from smact.screening import pauling_test
 
-from constants import CompScalerMeans, CompScalerStds
-from data_utils import StandardScaler
+from models_ddpm.constants import CompScalerMeans, CompScalerStds
+from models_ddpm.data_utils import StandardScaler
 # from pl_data.dataset import TensorCrystDataset
 # from pl_data.datamodule import worker_init_fn
 
@@ -63,6 +66,54 @@ def load_data(file_path):
     return data
 
 
+def get_model_path(eval_model_name):
+    # import cdvae
+    # model_path = Path('cdvae/prop_models/'+str(eval_model_name))
+    model_path = Path('/home/kishalay/hydra/singlerun/2023-11-08/perov/')
+    print(model_path)
+    # model_path = (Path(cdvae.__file__).parent / 'prop_models' / eval_model_name)
+    return model_path
+
+
+
+def load_model(model_path, load_data=False, testing=True):
+    abs_path=os.path.abspath(str(model_path))
+    print(type(model_path))
+    print(abs_path)
+    with initialize_config_dir(config_dir=abs_path):
+        cfg = compose(config_name='hparams')
+        model = hydra.utils.instantiate(
+            cfg.model,
+            optim=cfg.optim,
+            data=cfg.data,
+            logging=cfg.logging,
+            _recursive_=False,
+        )
+        ckpts = list(model_path.glob('*.ckpt'))
+        print(ckpts)
+        if len(ckpts) > 0:
+            ckpt_epochs = np.array(
+                [int(ckpt.parts[-1].split('-')[0].split('=')[1]) for ckpt in ckpts])
+            ckpt = str(ckpts[ckpt_epochs.argsort()[-1]])
+        print(ckpt)
+        model = model.load_from_checkpoint(ckpt)
+        model.lattice_scaler = torch.load(model_path / 'lattice_scaler.pt')
+        model.scaler = torch.load(model_path / 'prop_scaler.pt')
+
+        if load_data:
+            datamodule = hydra.utils.instantiate(
+                cfg.data.datamodule, _recursive_=False, scaler_path=model_path
+            )
+            if testing:
+                datamodule.setup('test')
+                test_loader = datamodule.test_dataloader()[0]
+            else:
+                datamodule.setup()
+                test_loader = datamodule.val_dataloader()[0]
+        else:
+            test_loader = None
+
+    return model, test_loader, cfg
 
 
 def get_crystals_list(frac_coords, atom_types, lengths, angles, num_atoms):
@@ -74,7 +125,18 @@ def get_crystals_list(frac_coords, atom_types, lengths, angles, num_atoms):
         angles: (num_crystals)
         num_atoms: (num_crystals)
     """
+    # print('frac coords',frac_coords.size())
+    # print('atom_types',atom_types.size())
+    # print('num_atoms',num_atoms.size())
+    # print('lengths',lengths.size())
+    # print('angles',angles.size())
+    #
+    # print(frac_coords.size(0))
+    # print(atom_types.size(0))
+    # print(num_atoms.sum())
 
+    assert frac_coords.size(0) == atom_types.size(0) == num_atoms.sum()
+    assert lengths.size(0) == angles.size(0) == num_atoms.size(0)
 
     start_idx = 0
     crystal_array_list = []
@@ -90,7 +152,11 @@ def get_crystals_list(frac_coords, atom_types, lengths, angles, num_atoms):
             'lengths': cur_lengths.detach().cpu().numpy(),
             'angles': cur_angles.detach().cpu().numpy(),
         })
+
         start_idx = start_idx + num_atom
+        if batch_idx==2:
+            print(crystal_array_list)
+            exit()
     return crystal_array_list
 
 

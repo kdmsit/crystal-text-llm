@@ -21,6 +21,7 @@ import time
 
 from eval_utils import (smact_validity, structure_validity, CompScaler, get_fp_pdist, load_data, get_crystals_list, compute_cov)
 
+from models_ddpm.utils import cif2png
 
 CrystalNNFP = CrystalNNFingerprint.from_preset("ops")
 CompFP = ElementProperty.from_preset('magpie')
@@ -46,6 +47,10 @@ class Crystal(object):
         self.atom_types = crys_array_dict['atom_types']
         self.lengths = crys_array_dict['lengths']
         self.angles = crys_array_dict['angles']
+        # print(self.frac_coords)
+        # print(self.atom_types)
+        # print(self.lengths)
+        # print(self.angles)
         self.dict = crys_array_dict
 
         self.get_structure()
@@ -106,6 +111,87 @@ class Crystal(object):
             return
         self.struct_fp = np.array(site_fps).mean(axis=0)
 
+
+class RecEval(object):
+
+    def __init__(self, pred_crys, gt_crys, stol=0.5, angle_tol=10, ltol=0.3):
+        assert len(pred_crys) == len(gt_crys)
+        self.matcher = StructureMatcher(
+            stol=stol, angle_tol=angle_tol, ltol=ltol)
+        self.preds = pred_crys
+        self.gts = gt_crys
+
+    def get_match_rate_and_rms(self):
+        def process_one(pred, gt, is_valid):
+            if not is_valid:
+                return None
+            try:
+                rms_dist = self.matcher.get_rms_dist(
+                    pred.structure, gt.structure)
+                rms_dist = None if rms_dist is None else rms_dist[0]
+                return rms_dist
+            except Exception:
+                return None
+        validity = [c.valid for c in self.preds]
+
+        rms_dists = []
+        for i in tqdm(range(len(self.preds))):
+            rms_dists.append(process_one(self.preds[i], self.gts[i], validity[i]))
+        rms_dists = np.array(rms_dists)
+        match_rate = sum(rms_dists != None) / len(self.preds)
+        mean_rms_dist = rms_dists[rms_dists != None].mean()
+        return {'match_rate': match_rate,
+                'rms_dist': mean_rms_dist}
+
+    def get_metrics(self):
+        return self.get_match_rate_and_rms()
+
+
+class RecEvalBatch(object):
+
+    def __init__(self, pred_crys, gt_crys, stol=0.5, angle_tol=10, ltol=0.3):
+        self.matcher = StructureMatcher(stol=stol, angle_tol=angle_tol, ltol=ltol)
+        self.preds = pred_crys
+        self.gts = gt_crys
+        self.batch_size = len(self.preds)
+
+    def get_match_rate_and_rms(self):
+        def process_one(pred, gt, is_valid):
+            if not is_valid:
+                return None
+            try:
+                rms_dist = self.matcher.get_rms_dist(
+                    pred.structure, gt.structure)
+                rms_dist = None if rms_dist is None else rms_dist[0]
+                return rms_dist
+            except Exception:
+                return None
+
+        rms_dists = []
+        self.all_rms_dis = np.zeros((self.batch_size, len(self.gts)))
+        for i in tqdm(range(len(self.preds[0]))):
+            tmp_rms_dists = []
+            for j in range(self.batch_size):
+                rmsd = process_one(self.preds[j][i], self.gts[i], self.preds[j][i].valid)
+                self.all_rms_dis[j][i] = rmsd
+                if rmsd is not None:
+                    tmp_rms_dists.append(rmsd)
+            if len(tmp_rms_dists) == 0:
+                rms_dists.append(None)
+            else:
+                rms_dists.append(np.min(tmp_rms_dists))
+
+        rms_dists = np.array(rms_dists)
+        match_rate = sum(rms_dists != None) / len(self.preds[0])
+        mean_rms_dist = rms_dists[rms_dists != None].mean()
+        return {'match_rate': match_rate,
+                'rms_dist': mean_rms_dist}
+
+    def get_metrics(self):
+        metrics = {}
+        metrics.update(self.get_match_rate_and_rms())
+        return metrics
+
 class GenEval(object):
 
     def __init__(self, pred_crys, gt_crys, n_samples=1000, eval_model_name=None):
@@ -115,13 +201,13 @@ class GenEval(object):
         self.eval_model_name = eval_model_name
 
         valid_crys = [c for c in pred_crys if c.valid]
-        self.valid_samples = valid_crys
-
-        # if len(valid_crys) >= n_samples:
-        #     sampled_indices = np.random.choice(len(valid_crys), n_samples, replace=False)
-        #     self.valid_samples = [valid_crys[i] for i in sampled_indices]
-        # else:
-        #     raise Exception(f'not enough valid crystals in the predicted set: {len(valid_crys)}/{n_samples}')
+        if len(valid_crys) >= n_samples:
+            sampled_indices = np.random.choice(
+                len(valid_crys), n_samples, replace=False)
+            self.valid_samples = [valid_crys[i] for i in sampled_indices]
+        else:
+            raise Exception(
+                f'not enough valid crystals in the predicted set: {len(valid_crys)}/{n_samples}')
 
     def get_validity(self):
         comp_valid = np.array([c.comp_valid for c in self.crys]).mean()
@@ -147,7 +233,8 @@ class GenEval(object):
         return {'wdist_density': wdist_density}
 
     def get_num_elem_wdist(self):
-        pred_nelems = [len(set(c.structure.species)) for c in self.valid_samples]
+        pred_nelems = [len(set(c.structure.species))
+                       for c in self.valid_samples]
         gt_nelems = [len(set(c.structure.species)) for c in self.gt_crys]
         wdist_num_elems = wasserstein_distance(pred_nelems, gt_nelems)
         return {'wdist_num_elems': wdist_num_elems}
@@ -163,31 +250,32 @@ class GenEval(object):
     def get_metrics(self):
         metrics = {}
         metrics.update(self.get_validity())
-        metrics.update(self.get_comp_diversity())
-        metrics.update(self.get_struct_diversity())
+        # metrics.update(self.get_comp_diversity())
+        # metrics.update(self.get_struct_diversity())
         metrics.update(self.get_density_wdist())
         metrics.update(self.get_num_elem_wdist())
         metrics.update(self.get_coverage())
         return metrics
 
 
-def get_crystal_array_list(file_path, batch_idx=0):
+def get_file_paths(root_path, task, label='', suffix='pt'):
+    if label == '':
+        out_name = f'eval_{task}.{suffix}'
+    else:
+        out_name = f'eval_{task}_{label}.{suffix}'
+    out_name = os.path.join(root_path, out_name)
+    return out_name
+
+
+def get_crystal_array_list(file_path):
     data = load_data(file_path)
-    batch_size = len(data['frac_coords'])
-    print(batch_size)
-    crystal_array_list = []
-    for batch_idx in range(batch_size):
-        frac_coords = data['frac_coords'][batch_idx]
-        atom_types = data['atom_types'][batch_idx]
-        lengths = data['lengths'][batch_idx]
-        angles = data['angles'][batch_idx]
-        crystal_array_list.append({
-            'frac_coords': frac_coords,
-            'atom_types': atom_types,
-            'lengths': lengths,
-            'angles': angles,
-        })
-    return crystal_array_list
+    crys_array_list = get_crystals_list(data['frac_coords'][0],
+                                        data['atom_types'][0],
+                                        data['lengths'][0],
+                                        data['angles'][0],
+                                        data['num_atoms'][0])
+
+    return crys_array_list
 
 def get_gt_crys_ori(cif):
     structure = Structure.from_str(cif,fmt='cif')
@@ -207,19 +295,49 @@ def task(x):
 
 def main(args):
     all_metrics = {}
-    dataset = "mp_20"
+    dataset = args.root_path.split('/')[1]
     print(dataset)
     eval_model_name = dataset
 
     out = open("result.txt", "a")
 
+    if 'gen_vae' in args.tasks:
+        gen_file_path = get_file_paths(args.root_path, 'gen', args.label)
+        crys_array_list = get_crystal_array_list(gen_file_path)
+
+        pred_crys = p_map(lambda x: Crystal(x), crys_array_list)
+        gen_crys = pred_crys
+
+        csv = pd.read_csv(args.gt_file)
+        gt_crys = p_map(get_gt_crys_ori, csv['cif'])
+
+        gen_evaluator = GenEval(gen_crys, gt_crys, eval_model_name=eval_model_name)
+        gen_metrics = gen_evaluator.get_metrics()
+        all_metrics.update(gen_metrics)
+
+        rec_evaluator = RecEval(pred_crys, gt_crys)
+        recon_metrics = rec_evaluator.get_metrics()
+        all_metrics.update(recon_metrics)
+
+        gen_path = str(args.root_path) + 'generated/'
+        if not os.path.exists(gen_path):
+            os.makedirs(gen_path)
+
+        # print("Save the generated Images...")
+        # for i in range(100):
+        #     crystal = gen_crys[i]
+        #     crystal.structure.to(filename=gen_path + str(i) + ".cif")
+        # print("Saved the generated Images...[DONE]")
+
     if 'gen' in args.tasks:
-        crys_array_list = get_crystal_array_list("eval_gen.pt",0)
+        gen_file_path = get_file_paths(args.root_path, 'gen', args.label)
+        print(gen_file_path)
+        crys_array_list = get_crystal_array_list(gen_file_path)
 
 
         gen_crys = p_map(lambda x: Crystal(x), crys_array_list)
 
-        gen_path = 'generated/'
+        gen_path = str(args.root_path)+'generated/'
         if not os.path.exists(gen_path):
             os.makedirs(gen_path)
 
@@ -248,7 +366,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    # parser.add_argument('--root_path', required=True)
+    parser.add_argument('--root_path', required=True)
     parser.add_argument('--label', default='')
     parser.add_argument('--tasks', nargs='+', default=['recon', 'gen', 'opt'])
     parser.add_argument('--multi_eval', action='store_true')
