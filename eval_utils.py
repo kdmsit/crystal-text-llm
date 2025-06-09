@@ -110,6 +110,8 @@ def smact_validity(comp, count,use_pauling_test=True,include_alloys=True):
 
     for elem in comp:
         try:
+            if elem<0:
+                elem=0
             chem_symbol = chemical_symbols[elem]
             s.append(chem_symbol)
         except Exception:
