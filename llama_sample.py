@@ -130,12 +130,9 @@ def unconditional_sample(args):
     pbar = tqdm(total=args.num_samples, desc="Generating Samples")
 
     while len(outputs) < args.num_samples:
-        print(len(outputs))
         batch_prompts = prompts[len(outputs):len(outputs)+args.batch_size]
-
         batch = tokenizer(list(batch_prompts), return_tensors="pt")
         batch = {k: v.cuda() for k, v in batch.items()}
-
         generate_ids = model.generate(**batch, do_sample=True, max_new_tokens=500, temperature=args.temperature, top_p=args.top_p)
         gen_strs = tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)
         for gen_str, prompt in zip(gen_strs, batch_prompts):
