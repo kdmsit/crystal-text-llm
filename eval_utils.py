@@ -119,9 +119,9 @@ def smact_validity(comp, count,use_pauling_test=True,include_alloys=True):
     elem_symbols = tuple(s)
 
     try:
-        elem_symbols = tuple([chemical_symbols[elem] for elem in comp])
+        space = smact.element_dictionary(elem_symbols)
     except Exception:
-        print(comp)
+        print(elem_symbols)
 
     # elem_symbols = tuple([chemical_symbols[elem] for elem in comp])
     # space = smact.element_dictionary(elem_symbols)
