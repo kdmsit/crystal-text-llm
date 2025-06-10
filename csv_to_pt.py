@@ -18,9 +18,9 @@ def main(args):
     pbar = tqdm(total=len(df_data), desc="Generating Samples")
     for index, row in df_data.iterrows():
         # print(index)
-        if index in [152,154,294,295]:
+        if index in [152,154,291, 294,295]:
             continue
-        cif_str = row['cif']
+        cif_str = str(row['cif'])
         try:
             frac_coords, atom_types, lengths, angles, num_atoms = process_one(cif_str, True, False,'crystalnn', False, 0.01)
         except Exception as e:
