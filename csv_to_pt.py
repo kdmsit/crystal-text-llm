@@ -17,7 +17,11 @@ def main(args):
     pbar = tqdm(total=len(df_data), desc="Generating Samples")
     for index, row in df_data.iterrows():
         cif_str = row['gen_str']
-        frac_coords, atom_types, lengths, angles, num_atoms = process_one(cif_str, True, False,'crystalnn', False, 0.01)
+        try:
+            frac_coords, atom_types, lengths, angles, num_atoms = process_one(cif_str, True, False,'crystalnn', False, 0.01)
+        except Exception as e:
+            print(e)
+            continue
         num_atoms = torch.tensor([num_atoms])
         frac_coords = torch.tensor(frac_coords)
         atom_types = torch.tensor(atom_types)
