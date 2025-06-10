@@ -152,6 +152,7 @@ def unconditional_sample(args):
                                                                               'crystalnn', False, 0.01)
             num_atoms = torch.tensor([num_atoms])
             frac_coords = torch.tensor(frac_coords)
+            print(atom_types)
             atom_types = torch.tensor(atom_types)
             lengths = torch.tensor(lengths)
             angles = torch.tensor(angles)
