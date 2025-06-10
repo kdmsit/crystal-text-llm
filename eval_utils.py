@@ -62,8 +62,6 @@ def load_data(file_path):
     data = torch.load(file_path)
     return data
 
-def rectify_atomtypes(cur_atom_types):
-
 
 def get_crystals_list(frac_coords, atom_types, lengths, angles, num_atoms):
     """
