@@ -21,8 +21,8 @@ def main(args):
 
     pbar = tqdm(total=len(df_data), desc="Generating Samples")
     for index, row in df_data.iterrows():
-        # print(index)
-        if index in [62]:
+        print(index)
+        if index == 62:
             continue
         cif_str = str(row['cif'])
         # future = executor.submit(task, cif_str)
