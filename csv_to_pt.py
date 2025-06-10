@@ -3,7 +3,7 @@ import argparse
 import pandas as pd
 from tqdm import tqdm
 from data_utils import process_one
-
+from concurrent.futures import ThreadPoolExecutor, TimeoutError
 
 def task(cif_str):
     return process_one(cif_str, True, False,'crystalnn', False, 0.01)
