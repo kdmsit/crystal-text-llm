@@ -226,10 +226,7 @@ def main(args):
         print(gen_file_path)
         crys_array_list = get_crystal_array_list(gen_file_path)
 
-
         gen_crys = p_map(lambda x: Crystal(x), crys_array_list)
-        for crys in gen_crys:
-            print(crys.atom_types)
 
         gen_path = str(args.root_path)+'generated/'
         if not os.path.exists(gen_path):
