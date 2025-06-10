@@ -91,6 +91,7 @@ def get_crystals_list(frac_coords, atom_types, lengths, angles, num_atoms):
     for batch_idx, num_atom in enumerate(num_atoms.tolist()):
         cur_frac_coords = frac_coords.narrow(0, start_idx, num_atom)
         cur_atom_types = atom_types.narrow(0, start_idx, num_atom)
+        print(cur_atom_types)
         cur_lengths = lengths[batch_idx]
         cur_angles = angles[batch_idx]
 
