@@ -5,7 +5,8 @@ from tqdm import tqdm
 from data_utils import process_one
 
 
-
+def task(cif_str):
+    return process_one(cif_str, True, False,'crystalnn', False, 0.01)
 
 
 def main(args):
@@ -15,17 +16,27 @@ def main(args):
 
     n_atom, x_coord, a_type, length, angle = [], [], [], [], []
     df_data = pd.read_csv(data_path)
+    executor = ThreadPoolExecutor(max_workers=16)
+
     pbar = tqdm(total=len(df_data), desc="Generating Samples")
     for index, row in df_data.iterrows():
         # print(index)
         # if index in [152,154,291, 294,295]:
         #     continue
         cif_str = str(row['cif'])
+        future = executor.submit(task, cif_str)
         try:
-            frac_coords, atom_types, lengths, angles, num_atoms = process_one(cif_str, True, False,'crystalnn', False, 0.01)
+            frac_coords, atom_types, lengths, angles, num_atoms = future.result(timeout=10)
+            # frac_coords, atom_types, lengths, angles, num_atoms = process_one(cif_str, True, False,'crystalnn', False, 0.01)
         except Exception as e:
             print(e)
             continue
+        except TimeoutError:
+            # print(f"Task {i} took too long. Skipping...")
+            skipped_count = skipped_count + 1
+            if skipped_count % 10 == 0:
+                print(f"Total {skipped_count} are skipped so far...")
+
         num_atoms = torch.tensor([num_atoms])
         frac_coords = torch.tensor(frac_coords)
         atom_types = torch.tensor(atom_types)
