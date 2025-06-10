@@ -1,3 +1,4 @@
+import torch
 import argparse
 import pandas as pd
 from tqdm import tqdm
@@ -16,7 +17,7 @@ def main(args):
     df_data = pd.read_csv(data_path)
     pbar = tqdm(total=len(df_data), desc="Generating Samples")
     for index, row in df_data.iterrows():
-        cif_str = row['gen_str']
+        cif_str = row['cif']
         try:
             frac_coords, atom_types, lengths, angles, num_atoms = process_one(cif_str, True, False,'crystalnn', False, 0.01)
         except Exception as e:
