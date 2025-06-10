@@ -8,6 +8,9 @@ from data_utils import process_one
 
 def main(args):
     data_path = args.data_path
+    file_name = data_path.replace('.csv', '')
+    print(file_name)
+
     n_atom, x_coord, a_type, length, angle = [], [], [], [], []
     pbar = tqdm(total=args.num_samples, desc="Generating Samples")
     df_data = pd.read_csv(data_path)
@@ -44,7 +47,7 @@ def main(args):
     print(length.size())
     print(angle.size())
 
-    path = os.path.join("eval_gen.pt")
+    path = os.path.join("eval_gen_"+str(file_name)+".pt")
     torch.save({
         "frac_coords": x_coord,
         "num_atoms": n_atom,
