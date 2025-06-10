@@ -118,13 +118,10 @@ def smact_validity(comp, count,use_pauling_test=True,include_alloys=True):
             continue
     elem_symbols = tuple(s)
 
-    try:
-        space = smact.element_dictionary(elem_symbols)
-    except Exception:
-        print(elem_symbols)
 
     # elem_symbols = tuple([chemical_symbols[elem] for elem in comp])
-    # space = smact.element_dictionary(elem_symbols)
+
+    space = smact.element_dictionary(elem_symbols)
     smact_elems = [e[1] for e in space.items()]
     electronegs = [e.pauling_eneg for e in smact_elems]
     ox_combos = [e.oxidation_states for e in smact_elems]
