@@ -18,7 +18,7 @@ def main(args):
     pbar = tqdm(total=len(df_data), desc="Generating Samples")
     for index, row in df_data.iterrows():
         # print(index)
-        if index in [152,154,295]:
+        if index in [152,154,294,295]:
             continue
         cif_str = row['cif']
         try:
