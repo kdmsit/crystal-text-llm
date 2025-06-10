@@ -90,13 +90,14 @@ def get_crystals_list(frac_coords, atom_types, lengths, angles, num_atoms):
     for batch_idx, num_atom in enumerate(num_atoms.tolist()):
         cur_frac_coords = frac_coords.narrow(0, start_idx, num_atom)
         cur_atom_types = atom_types.narrow(0, start_idx, num_atom)
-        # print(cur_atom_types)
+        print(cur_atom_types)
         # cur_atom_types = torch.where(
         #     (cur_atom_types < 0) | (cur_atom_types > 118),
         #     torch.tensor(1, dtype=cur_atom_types.dtype),
         #     cur_atom_types
         # )
         all_valid = ((cur_atom_types >= 0) & (cur_atom_types <= 119)).all().item()
+        print(all_valid)
         if not all_valid:
             continue
         # print(cur_atom_types)
