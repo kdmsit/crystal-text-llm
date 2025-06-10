@@ -96,6 +96,9 @@ def get_crystals_list(frac_coords, atom_types, lengths, angles, num_atoms):
             torch.tensor(1, dtype=cur_atom_types.dtype),
             cur_atom_types
         )
+        all_valid = ((cur_atom_types >= 0) & (cur_atom_types <= 119)).all().item()
+        if not all_valid:
+            continue
         # print(cur_atom_types)
         cur_lengths = lengths[batch_idx]
         cur_angles = angles[batch_idx]
@@ -108,6 +111,7 @@ def get_crystals_list(frac_coords, atom_types, lengths, angles, num_atoms):
         })
 
         start_idx = start_idx + num_atom
+    print(len(crystal_array_list))
     return crystal_array_list
 
 
