@@ -17,6 +17,7 @@ def main(args):
     df_data = pd.read_csv(data_path)
     pbar = tqdm(total=len(df_data), desc="Generating Samples")
     for index, row in df_data.iterrows():
+        print(index)
         if index in [152]:
             continue
         cif_str = row['cif']
