@@ -1,0 +1,61 @@
+import pandas as pd
+from tqdm import tqdm
+from data_utils import process_one
+
+
+
+
+
+def main(args):
+    data_path = args.data_path
+    n_atom, x_coord, a_type, length, angle = [], [], [], [], []
+    pbar = tqdm(total=args.num_samples, desc="Generating Samples")
+    df_data = pd.read_csv(data_path)
+    for index, row in df_data.iterrows():
+        cif_str = row['gen_str']
+        frac_coords, atom_types, lengths, angles, num_atoms = process_one(cif_str, True, False,'crystalnn', False, 0.01)
+        num_atoms = torch.tensor([num_atoms])
+        frac_coords = torch.tensor(frac_coords)
+        atom_types = torch.tensor(atom_types)
+        lengths = torch.tensor(lengths)
+        angles = torch.tensor(angles)
+
+        n_atom.append(num_atoms)
+        x_coord.append(frac_coords)
+        a_type.append(atom_types)
+        length.append(lengths.view(1, 3))
+        angle.append(angles.view(1, 3))
+        pbar.update(1)
+    n_atom = torch.cat(n_atom, dim=0)
+    x_coord = torch.cat(x_coord, dim=0)
+    a_type = torch.cat(a_type, dim=0)
+    length = torch.cat(length, dim=0)
+    angle = torch.cat(angle, dim=0)
+
+    n_atom = n_atom.unsqueeze(0)
+    x_coord = x_coord.unsqueeze(0)
+    a_type = a_type.unsqueeze(0)
+    length = length.unsqueeze(0)
+    angle = angle.unsqueeze(0)
+
+    print(n_atom.size())
+    print(x_coord.size())
+    print(a_type.size())
+    print(length.size())
+    print(angle.size())
+
+    path = os.path.join("eval_gen.pt")
+    torch.save({
+        "frac_coords": x_coord,
+        "num_atoms": n_atom,
+        "atom_types": a_type,
+        "lengths": length,
+        "angles": angle,
+    }, path)
+    print("Saved to file")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--data_path", type=str, required=True)
+    args = parser.parse_args()
