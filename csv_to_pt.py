@@ -17,6 +17,8 @@ def main(args):
     df_data = pd.read_csv(data_path)
     pbar = tqdm(total=len(df_data), desc="Generating Samples")
     for index, row in df_data.iterrows():
+        if index in [152]:
+            continue
         cif_str = row['cif']
         try:
             frac_coords, atom_types, lengths, angles, num_atoms = process_one(cif_str, True, False,'crystalnn', False, 0.01)
