@@ -13,8 +13,8 @@ def main(args):
     print(file_name)
 
     n_atom, x_coord, a_type, length, angle = [], [], [], [], []
-    pbar = tqdm(total=args.num_samples, desc="Generating Samples")
     df_data = pd.read_csv(data_path)
+    pbar = tqdm(total=df_data.size[0], desc="Generating Samples")
     for index, row in df_data.iterrows():
         cif_str = row['gen_str']
         frac_coords, atom_types, lengths, angles, num_atoms = process_one(cif_str, True, False,'crystalnn', False, 0.01)
