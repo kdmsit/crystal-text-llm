@@ -16,18 +16,19 @@ def main(args):
 
     n_atom, x_coord, a_type, length, angle = [], [], [], [], []
     df_data = pd.read_csv(data_path)
-    executor = ThreadPoolExecutor(max_workers=16)
+
+    # executor = ThreadPoolExecutor(max_workers=16)
 
     pbar = tqdm(total=len(df_data), desc="Generating Samples")
     for index, row in df_data.iterrows():
         # print(index)
-        # if index in [152,154,291, 294,295]:
-        #     continue
+        if index in [62]:
+            continue
         cif_str = str(row['cif'])
-        future = executor.submit(task, cif_str)
+        # future = executor.submit(task, cif_str)
         try:
-            frac_coords, atom_types, lengths, angles, num_atoms = future.result(timeout=10)
-            # frac_coords, atom_types, lengths, angles, num_atoms = process_one(cif_str, True, False,'crystalnn', False, 0.01)
+            # frac_coords, atom_types, lengths, angles, num_atoms = future.result(timeout=10)
+            frac_coords, atom_types, lengths, angles, num_atoms = process_one(cif_str, True, False,'crystalnn', False, 0.01)
         except Exception as e:
             print(e)
             continue
