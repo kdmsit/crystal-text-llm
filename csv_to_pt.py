@@ -23,11 +23,6 @@ def main(args):
 
     pbar = tqdm(total=len(df_data), desc="Generating Samples")
     for index, row in df_data.iterrows():
-        # print(index)
-        # if index == 62 or 63:
-        #     continue
-        # cif_str = str(row['cif'])
-        # future = executor.submit(task, cif_str)
         try:
             structure = Structure.from_str(row['cif'], fmt="cif")
             num_atoms = torch.LongTensor([structure.num_sites])
@@ -36,16 +31,18 @@ def main(args):
             frac_coords = torch.tensor(structure.frac_coords, dtype=torch.float)
             atom_types = torch.LongTensor(structure.atomic_numbers)
 
+            print(atom_types)
+            all_valid = ((atom_types >= 0) & (atom_types <= 119)).all().item()
+            if not all_valid:
+                print("Invalid atom types !!")
+                print(atom_types)
+                continue
+
             # frac_coords, atom_types, lengths, angles, num_atoms = future.result(timeout=10)
             # frac_coords, atom_types, lengths, angles, num_atoms = process_one(cif_str, True, False,'crystalnn', False, 0.01)
         except Exception as e:
             print(e)
             continue
-        except TimeoutError:
-            # print(f"Task {i} took too long. Skipping...")
-            skipped_count = skipped_count + 1
-            if skipped_count % 10 == 0:
-                print(f"Total {skipped_count} are skipped so far...")
 
         num_atoms = torch.tensor([num_atoms])
         frac_coords = torch.tensor(frac_coords)
