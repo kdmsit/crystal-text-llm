@@ -78,6 +78,7 @@ def main(args):
     print(angle.size())
 
     path = os.path.join("saved_gen_"+str(file_name)+".pt")
+    print(path)
     torch.save({
         "frac_coords": x_coord,
         "num_atoms": n_atom,
