@@ -24,10 +24,10 @@ def main(args):
         # print(index)
         # if index == 62 or 63:
         #     continue
-        cif_str = str(row['cif'])
+        # cif_str = str(row['cif'])
         # future = executor.submit(task, cif_str)
         try:
-            structure = Structure.from_str(cif_str, fmt="cif")
+            structure = Structure.from_str(row['cif'], fmt="cif")
             num_atoms = torch.LongTensor([structure.num_sites])
             lengths = torch.tensor([structure.lattice.lengths])
             angles = torch.tensor([structure.lattice.angles])
