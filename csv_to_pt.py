@@ -31,7 +31,7 @@ def main(args):
             frac_coords = torch.tensor(structure.frac_coords, dtype=torch.float)
             atom_types = torch.LongTensor(structure.atomic_numbers)
 
-            print(atom_types)
+            # print(atom_types)
             all_valid = ((atom_types >= 0) & (atom_types <= 119)).all().item()
             if not all_valid:
                 print("Invalid atom types !!")
