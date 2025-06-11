@@ -22,13 +22,20 @@ def main(args):
     pbar = tqdm(total=len(df_data), desc="Generating Samples")
     for index, row in df_data.iterrows():
         # print(index)
-        if index == 62 or 63:
-            continue
+        # if index == 62 or 63:
+        #     continue
         cif_str = str(row['cif'])
         # future = executor.submit(task, cif_str)
         try:
+            structure = Structure.from_str(cif_str, fmt="cif")
+            num_atoms = torch.LongTensor([structure.num_sites])
+            lengths = torch.tensor([structure.lattice.lengths])
+            angles = torch.tensor([structure.lattice.angles])
+            frac_coords = torch.tensor(structure.frac_coords, dtype=torch.float)
+            atom_types = torch.LongTensor(structure.atomic_numbers)
+
             # frac_coords, atom_types, lengths, angles, num_atoms = future.result(timeout=10)
-            frac_coords, atom_types, lengths, angles, num_atoms = process_one(cif_str, True, False,'crystalnn', False, 0.01)
+            # frac_coords, atom_types, lengths, angles, num_atoms = process_one(cif_str, True, False,'crystalnn', False, 0.01)
         except Exception as e:
             print(e)
             continue
