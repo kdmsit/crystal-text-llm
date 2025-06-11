@@ -189,6 +189,7 @@ def get_file_paths(root_path, task, label='', suffix='pt'):
 
 def get_crystal_array_list(file_path):
     data = load_data(file_path)
+    print(data['atom_types'][0])
     crys_array_list = get_crystals_list(data['frac_coords'][0],
                                         data['atom_types'][0],
                                         data['lengths'][0],
