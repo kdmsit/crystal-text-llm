@@ -222,7 +222,8 @@ def main(args):
     out = open("result.txt", "a")
 
     if 'gen' in args.tasks:
-        gen_file_path = get_file_paths(args.root_path, 'gen', args.label)
+        # gen_file_path = get_file_paths(args.root_path, 'gen', args.label)
+        gen_file_path = args.root_path
         print(gen_file_path)
         crys_array_list = get_crystal_array_list(gen_file_path)
 
