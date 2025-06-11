@@ -13,7 +13,7 @@ def task(cif_str):
 
 def main(args):
     data_path = args.data_path
-    file_name = data_path.replace('.csv', '')
+    file_name = data_path.split('/')[1].replace('.csv', '')
     print(file_name)
 
     n_atom, x_coord, a_type, length, angle = [], [], [], [], []
