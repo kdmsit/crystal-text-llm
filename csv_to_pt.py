@@ -3,6 +3,7 @@ import argparse
 import pandas as pd
 from tqdm import tqdm
 from data_utils import process_one
+from pymatgen.core.structure import Structure
 from concurrent.futures import ThreadPoolExecutor, TimeoutError
 
 def task(cif_str):
