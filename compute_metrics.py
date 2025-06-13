@@ -232,7 +232,7 @@ def main(args):
         gen_crys =[]
         for i in range(len(crys_array_list)):
             print(i)
-            if i==1405:
+            if i in [1405,3745]:
                 continue
             try:
                 gen_crys.append(Crystal(crys_array_list[i]))
