@@ -234,7 +234,11 @@ def main(args):
             print(i)
             if i==1405:
                 continue
-            gen_crys.append(Crystal(crys_array_list[i]))
+            try:
+                gen_crys.append(Crystal(crys_array_list[i]))
+            except Exception as e:
+                print(e)
+                continue
 
         # gen_path = str(args.root_path)+'generated/'
         # if not os.path.exists(gen_path):
