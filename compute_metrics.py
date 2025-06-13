@@ -231,6 +231,7 @@ def main(args):
         # gen_crys = p_map(lambda x: Crystal(x), crys_array_list)
         gen_crys =[]
         for i in range(len(crys_array_list)):
+            print(i)
             if i==1405:
                 continue
             gen_crys.append(Crystal(crys_array_list[i]))
