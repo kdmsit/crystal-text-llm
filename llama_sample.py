@@ -170,8 +170,8 @@ def unconditional_sample(args):
             length.append(lengths.view(1, 3))
             angle.append(angles.view(1, 3))
             data_dict = {'n_atom': num_atoms,
-                         'x_coord': x_coord,
-                         'a_type': a_type,
+                         'x_coord': frac_coords,
+                         'a_type': atom_types,
                          'length': lengths.view(1, 3),
                          'angle': angles.view(1, 3),}
             all_data.append(data_dict)
