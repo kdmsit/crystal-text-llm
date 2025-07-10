@@ -162,13 +162,14 @@ class SampleDataset(Dataset):
 
     def __getitem__(self, index):
         structure = self.data_dict[index]
+        print(structure["x_coord"])
         data = Data(
-            num_atoms=torch.LongTensor([structure["n_atom"].numpy()]),
-            num_nodes=structure["n_atom"].numpy(),
-            lengths=torch.tensor([structure["length"].numpy()]),
-            angles=torch.tensor([structure["angle"].numpy()]),
-            frac_coords=torch.tensor(structure["x_coord"].numpy(), dtype=torch.float),
-            atom_types=torch.LongTensor(structure["a_type"].numpy()))
+            num_atoms=torch.LongTensor([structure["n_atom"]]),
+            num_nodes=structure["n_atom"],
+            lengths=torch.tensor([structure["length"]]),
+            angles=torch.tensor([structure["angle"]]),
+            frac_coords=torch.tensor(structure["x_coord"], dtype=torch.float),
+            atom_types=torch.LongTensor(structure["a_type"]))
         return data
 
 def main(args):
