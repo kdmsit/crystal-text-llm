@@ -141,7 +141,7 @@ class SampleDataset(Dataset):
 
     def __init__(self, dataset):
         super().__init__()
-        data = torch.load(f"csp_task/gen/{dataset}/llm.pt")
+        data = torch.load(f"gen/{dataset}/llm.pt")
         self.frac_coords = data['frac_coords'][0]
         self.atom_types = data['atom_types'][0]
         self.lengths = data['lengths'][0]
