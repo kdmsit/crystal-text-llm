@@ -155,7 +155,7 @@ class SampleDataset(Dataset):
         print("lengths=> ",self.lengths.size())
         print("angles=> ",self.angles.size())
         print("num_atoms=> ",self.num_atoms.size())
-        print("data_dict=> ", len(self.data_dict.size))
+        print("data_dict=> ", len(self.data_dict))
 
     def __len__(self) -> int:
         return self.lengths.size(0)
