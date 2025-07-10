@@ -148,12 +148,14 @@ class SampleDataset(Dataset):
         self.lengths = data['lengths'][0]
         self.angles = data['angles'][0]
         self.num_atoms = data['num_atoms'][0]
+        self.data_dict = data['data_dict']
 
         print("frac_cooord=> ",self.frac_coords.size())
         print("atom_types=> ",self.atom_types.size())
         print("lengths=> ",self.lengths.size())
         print("angles=> ",self.angles.size())
         print("num_atoms=> ",self.num_atoms.size())
+        print("data_dict=> ", len(self.data_dict.size))
 
     def __len__(self) -> int:
         return self.lengths.size(0)
