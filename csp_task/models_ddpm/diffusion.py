@@ -87,11 +87,14 @@ class CSPDiffusion(nn.Module):
         return loss, loss_lattice, loss_coord
 
     @torch.no_grad()
-    def sample(self, batch, step_lr = 1e-5):
+    def sample(self, batch, step_lr = 1e-5,diff_steps = diff_steps):
 
         batch_size = batch.num_graphs
 
-        l_T, x_T = torch.randn([batch_size, 3, 3]).to(self.device), torch.rand([batch.num_nodes, 3]).to(self.device)
+        x_T= batch.frac_coords
+        l_T = lattice_params_to_matrix_torch(batch.lengths, batch.angles)
+
+        # l_T, x_T = torch.randn([batch_size, 3, 3]).to(self.device), torch.rand([batch.num_nodes, 3]).to(self.device)
 
         if self.keep_coords:
             x_T = batch.frac_coords
@@ -99,7 +102,8 @@ class CSPDiffusion(nn.Module):
         if self.keep_lattice:
             l_T = lattice_params_to_matrix_torch(batch.lengths, batch.angles)
 
-        time_start = self.beta_scheduler.timesteps
+        # time_start = self.beta_scheduler.timesteps
+        time_start = diff_steps
 
         traj = {time_start : {
             'num_atoms' : batch.num_atoms,
