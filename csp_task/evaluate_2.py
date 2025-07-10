@@ -11,6 +11,7 @@ from models_ddpm.dataset import MaterialDataset,MaterialDispDataset
 from torch_geometric.data import DataLoader
 from models_ddpm.decoder import GemNetTDecoder
 from models_ddpm.diffusion import CSPDiffusion
+from torch.utils.data import Dataset
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -136,7 +137,7 @@ def display(loader, model, step_lr, diff_steps):
     return (frac_coords, atom_types, lattices, lengths, angles, num_atoms, mat_ids, sam_ids)
 
 
-class SampleDataset3(Dataset):
+class SampleDataset(Dataset):
 
     def __init__(self, dataset):
         super().__init__()
@@ -164,7 +165,7 @@ def main(args):
     model_path = Path(args.model_path,args.dataset)
     print("Tasks: ",args.tasks)
 
-    test_set = SampleDataset3()
+    test_set = SampleDataset(args.dataset)
     test_dataloader = DataLoader(test_set, batch_size=args.batch_size, shuffle=True, pin_memory=True)
 
     device = config.device
