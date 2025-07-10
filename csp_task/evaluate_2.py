@@ -162,7 +162,7 @@ class SampleDataset(Dataset):
 
     def __getitem__(self, index):
         structure = self.data_dict[index]
-        print(structure["x_coord"])
+        print(len(structure["x_coord"]))
         data = Data(
             num_atoms=torch.LongTensor([structure["n_atom"]]),
             num_nodes=structure["n_atom"],
