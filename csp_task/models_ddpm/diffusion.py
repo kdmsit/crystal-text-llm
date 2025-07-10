@@ -87,7 +87,7 @@ class CSPDiffusion(nn.Module):
         return loss, loss_lattice, loss_coord
 
     @torch.no_grad()
-    def sample(self, batch, step_lr = 1e-5,diff_steps = diff_steps):
+    def sample(self, batch, step_lr = 1e-5,diff_steps = 1000):
 
         batch_size = batch.num_graphs
 
