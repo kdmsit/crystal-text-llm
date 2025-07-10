@@ -346,34 +346,19 @@ def main(args):
     print(all_metrics)
 
     if 'gen' in args.tasks:
-        recon_file_path = get_file_paths(args.root_path, 'gen', args.label)
-        print(recon_file_path)
-        batch_idx = -1 if args.multi_eval else 0
-        crys_array_list, true_crystal_array_list = get_crystal_array_list(recon_file_path,batch_idx)
+        # gen_file_path = get_file_paths(args.root_path, 'gen', args.label)
+        gen_file_path = args.root_path
+        print(gen_file_path)
+        crys_array_list = get_crystal_array_list(gen_file_path)
 
-        if not args.multi_eval:
-            pred_crys = p_map(lambda x: Crystal(x), crys_array_list)
-        else:
-            pred_crys = []
-            for i in range(len(crys_array_list)):
-                print(f"Processing batch {i}/ {len(crys_array_list)}")
-                pred_crys.append(p_map(lambda x: Crystal(x), crys_array_list[i]))
+        gen_crys = p_map(lambda x: Crystal(x), crys_array_list)
 
-        gt_crys = p_map(lambda x: Crystal(x), true_crystal_array_list)
+        csv = pd.read_csv(args.gt_file)
+        gt_crys = p_map(get_gt_crys_ori, csv['cif'])
 
-        # print("Save the generated Images...")
-        # for i in range(len(pred_crys)):
-        #     crystal = pred_crys[i]
-        #     crystal.structure.to(filename='generated/' + str(i) + ".cif")
-        # print("Saved the generated Images...[DONE]")
-
-        if args.multi_eval:
-            rec_evaluator = RecEvalBatch(pred_crys, gt_crys)
-        else:
-            rec_evaluator = RecEval(pred_crys, gt_crys)
-        recon_metrics = rec_evaluator.get_metrics()
-        all_metrics.update(recon_metrics)
-    print(all_metrics)
+        gen_evaluator = GenEval(gen_crys, gt_crys, eval_model_name=eval_model_name)
+        gen_metrics = gen_evaluator.get_metrics()
+        all_metrics.update(gen_metrics)
 
 
 if __name__ == '__main__':
