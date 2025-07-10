@@ -149,8 +149,7 @@ class SampleDataset(Dataset):
         self.num_atoms = data['num_atoms'][0]
 
     def __len__(self) -> int:
-        print(self.lengths.size(0))
-        return len(self.structs)
+        return self.lengths.size(0)
 
     def __getitem__(self, index):
         data = Data(
