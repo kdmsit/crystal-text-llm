@@ -12,6 +12,7 @@ from torch_geometric.data import DataLoader
 from models_ddpm.decoder import GemNetTDecoder
 from models_ddpm.diffusion import CSPDiffusion
 from torch.utils.data import Dataset
+from torch_geometric.data import Data
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
