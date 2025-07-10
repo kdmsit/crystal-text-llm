@@ -229,7 +229,7 @@ def main(args):
         crys_array_list = get_crystal_array_list(gen_file_path)
 
         gen_crys = p_map(lambda x: Crystal(x), crys_array_list)
-        
+
         # gen_crys =[]
         # for i in range(len(crys_array_list)):
         #     print(i)
