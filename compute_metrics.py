@@ -228,17 +228,18 @@ def main(args):
         print(gen_file_path)
         crys_array_list = get_crystal_array_list(gen_file_path)
 
-        # gen_crys = p_map(lambda x: Crystal(x), crys_array_list)
-        gen_crys =[]
-        for i in range(len(crys_array_list)):
-            print(i)
-            if i in [1405,3745]:
-                continue
-            try:
-                gen_crys.append(Crystal(crys_array_list[i]))
-            except Exception as e:
-                print(e)
-                continue
+        gen_crys = p_map(lambda x: Crystal(x), crys_array_list)
+        
+        # gen_crys =[]
+        # for i in range(len(crys_array_list)):
+        #     print(i)
+        #     if i in [1405,3745]:
+        #         continue
+        #     try:
+        #         gen_crys.append(Crystal(crys_array_list[i]))
+        #     except Exception as e:
+        #         print(e)
+        #         continue
 
         # gen_path = str(args.root_path)+'generated/'
         # if not os.path.exists(gen_path):
