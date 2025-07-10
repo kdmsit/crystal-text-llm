@@ -127,6 +127,7 @@ def unconditional_sample(args):
 
     outputs = []
     n_atom, x_coord, a_type, length, angle = [], [], [], [], []
+    all_data=[]
     pbar = tqdm(total=args.num_samples, desc="Generating Samples")
 
     while len(outputs) < args.num_samples:
@@ -148,8 +149,7 @@ def unconditional_sample(args):
             outputs.append({ "gen_str": gen_str, "cif": cif_str, "model_name": args.model_name })
 
 
-            frac_coords, atom_types, lengths, angles, num_atoms = process_one(cif_str, True, False,
-                                                                              'crystalnn', False, 0.01)
+            frac_coords, atom_types, lengths, angles, num_atoms = process_one(cif_str, True, False, 'crystalnn', False, 0.01)
             num_atoms = torch.tensor([num_atoms])
             frac_coords = torch.tensor(frac_coords)
 
@@ -169,6 +169,12 @@ def unconditional_sample(args):
             a_type.append(atom_types)
             length.append(lengths.view(1, 3))
             angle.append(angles.view(1, 3))
+            data_dict = {'n_atom': num_atoms,
+                         'x_coord': x_coord,
+                         'a_type': a_type,
+                         'length': lengths.view(1, 3),
+                         'angle': angles.view(1, 3),}
+            all_data.append(data_dict)
         pbar.update(1)
 
 
@@ -203,6 +209,7 @@ def unconditional_sample(args):
         "atom_types": a_type,
         "lengths": length,
         "angles": angle,
+        "data_dict": all_data,
     }, path)
     print("Saved to file")
 
