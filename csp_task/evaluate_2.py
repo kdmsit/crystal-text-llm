@@ -206,7 +206,7 @@ def main(args):
     if 'gen' in args.tasks:
         print('Evaluate model on the generation task.')
         start_time = time.time()
-        (frac_coords,  atom_types,_, lengths, angles, num_atoms) = generation(test_dataloader, model, step_lr, args.diff_steps)
+        (frac_coords,  atom_types,_, lengths, angles, num_atoms) = generation(test_dataloader, model, args.num_evals, step_lr, args.diff_steps)
         print('Generation Time :',time.time() - start_time)
         gen_out_name = 'eval_gen.pt'
         print('Saving Pt File..')
