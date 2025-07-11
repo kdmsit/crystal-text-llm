@@ -158,7 +158,7 @@ class SampleDataset(Dataset):
             num_nodes=structure["n_atom"],
             lengths=structure["length"],
             angles=structure["angle"],
-            frac_coords=torch.tensor(structure["x_coord"], dtype=torch.float),
+            frac_coords=torch.Tensor(structure["x_coord"]),
             atom_types=torch.LongTensor(structure["a_type"]))
         return data
 
