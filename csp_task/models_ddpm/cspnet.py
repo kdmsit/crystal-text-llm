@@ -74,7 +74,7 @@ class CSPLayer(nn.Module):
         lattice_ips_flatten = lattice_ips.view(-1, 9)
         lattice_ips_flatten_edges = lattice_ips_flatten[edge2graph]
         edges_input = torch.cat([hi, hj, lattice_ips_flatten_edges, frac_diff], dim=1)
-        edge_features = self.edge_mlp(edges_input)
+        edge_features = self.edge_mlp(edges_input.float())
         return edge_features
 
     def node_model(self, node_features, edge_features, edge_index):
