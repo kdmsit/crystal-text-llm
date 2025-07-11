@@ -155,7 +155,7 @@ class SampleDataset(Dataset):
         data = Data(
             num_atoms=torch.LongTensor([structure["n_atom"]]),
             num_nodes=structure["n_atom"],
-            num_bonds=structure["edge_index"].shape[0],
+            num_bonds=structure["edge_indices"].shape[0],
             lengths=structure["length"],
             angles=structure["angle"],
             frac_coords=torch.Tensor(structure["x_coord"]),
