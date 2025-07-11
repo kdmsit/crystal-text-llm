@@ -160,7 +160,7 @@ class SampleDataset(Dataset):
             angles=structure["angle"],
             frac_coords=torch.Tensor(structure["x_coord"]),
             atom_types=torch.LongTensor(structure["a_type"]),
-            edge_index=torch.LongTensor(structure["edge_index"].T).contiguous(),  # shape (2, num_edges)
+            edge_index=torch.LongTensor(structure["edge_indices"].T).contiguous(),  # shape (2, num_edges)
             to_jimages=torch.LongTensor(structure["to_jimages"]),
         )
         return data
