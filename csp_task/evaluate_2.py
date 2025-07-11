@@ -116,7 +116,7 @@ def generation(loader, model, num_evals, step_lr = 1e-5, diff_steps = 1000):
         atom_types.append(torch.stack(batch_atom_types, dim=0))
         lattices.append(torch.stack(batch_lattices, dim=0))
 
-        input_data_list += [d.to(device) for d in input_data_list]
+        print(input_data_list)
         input_data_list = input_data_list + batch.to_data_list()
 
     frac_coords = torch.cat(frac_coords, dim=1)
