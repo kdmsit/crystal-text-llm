@@ -116,17 +116,18 @@ def generation(loader, model, num_evals, step_lr = 1e-5, diff_steps = 1000):
         atom_types.append(torch.stack(batch_atom_types, dim=0))
         lattices.append(torch.stack(batch_lattices, dim=0))
 
-        batch = batch.to(device)
-        input_data_list = input_data_list + batch.to_data_list()
+        # batch = batch.to(device)
+        # input_data_list = input_data_list + batch.to_data_list()
 
     frac_coords = torch.cat(frac_coords, dim=1)
     num_atoms = torch.cat(num_atoms, dim=1)
     atom_types = torch.cat(atom_types, dim=1)
     lattices = torch.cat(lattices, dim=1)
     lengths, angles = lattices_to_params_shape(lattices)
-    input_data_batch = Batch.from_data_list(input_data_list)
+    # input_data_batch = Batch.from_data_list(input_data_list)
 
-    return (frac_coords, atom_types, lattices, lengths, angles, num_atoms, input_data_batch)
+    # return (frac_coords, atom_types, lattices, lengths, angles, num_atoms, input_data_batch)
+    return (frac_coords, atom_types, lattices, lengths, angles, num_atoms)
 
 
 class SampleDataset(Dataset):
