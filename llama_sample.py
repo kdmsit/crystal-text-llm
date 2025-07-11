@@ -175,8 +175,8 @@ def unconditional_sample(args):
                          'a_type': atom_types,
                          'length': lengths.view(1, 3),
                          'angle': angles.view(1, 3),
-                         'edge_indices': edge_indices.view(1, 3),
-                         'to_jimages': to_jimages.view(1, 3),
+                         'edge_indices': edge_indices,
+                         'to_jimages': to_jimages,
                          }
             all_data.append(data_dict)
         pbar.update(1)
