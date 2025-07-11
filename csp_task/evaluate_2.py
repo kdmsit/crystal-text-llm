@@ -152,14 +152,17 @@ class SampleDataset(Dataset):
 
     def __getitem__(self, index):
         structure = self.data_dict[index]
-        print(len(structure["x_coord"]))
         data = Data(
             num_atoms=torch.LongTensor([structure["n_atom"]]),
             num_nodes=structure["n_atom"],
+            num_bonds=structure["edge_index"].shape[0],
             lengths=structure["length"],
             angles=structure["angle"],
             frac_coords=torch.Tensor(structure["x_coord"]),
-            atom_types=torch.LongTensor(structure["a_type"]))
+            atom_types=torch.LongTensor(structure["a_type"]),
+            edge_index=torch.LongTensor(structure["edge_index"].T).contiguous(),  # shape (2, num_edges)
+            to_jimages=torch.LongTensor(structure["to_jimages"]),
+        )
         return data
 
 def main(args):

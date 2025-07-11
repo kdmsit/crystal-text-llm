@@ -1114,7 +1114,7 @@ def get_scaler_from_data_list(data_list, key):
 def process_one(crystal_str, niggli, primitive, graph_method, use_space_group = False, tol=0.01):
     crystal = build_crystal(crystal_str, niggli=niggli, primitive=primitive)
     frac_coords, atom_types, lengths, angles, edge_indices, to_jimages, num_atoms = build_crystal_graph(crystal, graph_method)
-    return frac_coords, atom_types, lengths, angles, num_atoms
+    return frac_coords, atom_types, lengths, angles, num_atoms, edge_indices, to_jimages
 
 
 def preprocess(input_file, num_workers, niggli, primitive, graph_method,prop_list, use_space_group = False, tol=0.01):
