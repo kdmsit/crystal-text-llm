@@ -156,8 +156,8 @@ class SampleDataset(Dataset):
         data = Data(
             num_atoms=torch.LongTensor([structure["n_atom"]]),
             num_nodes=structure["n_atom"],
-            lengths=[structure["length"]],
-            angles=[structure["angle"]],
+            lengths=structure["length"],
+            angles=structure["angle"],
             frac_coords=torch.tensor(structure["x_coord"], dtype=torch.float),
             atom_types=torch.LongTensor(structure["a_type"]))
         return data
