@@ -89,53 +89,43 @@ def reconstructon(loader, model, num_evals, step_lr = 1e-5):
 
     return (frac_coords, atom_types, lattices, lengths, angles, num_atoms, input_data_batch)
 
-def generation(loader, model, step_lr):
+def generation(loader, model, num_evals, step_lr = 1e-5, diff_steps = 1000):
+    """
+    reconstruct the crystals in <loader>.
+    """
     frac_coords = []
     num_atoms = []
     atom_types = []
     lattices = []
+    input_data_list = []
     for idx, batch in enumerate(loader):
         if torch.cuda.is_available():
             batch.cuda()
-        outputs, traj = model.sample(batch, step_lr=step_lr)
-        frac_coords.append(outputs['frac_coords'].detach().cpu())
-        num_atoms.append(outputs['num_atoms'].detach().cpu())
-        atom_types.append(outputs['atom_types'].detach().cpu())
-        lattices.append(outputs['lattices'].detach().cpu())
+        batch_frac_coords, batch_num_atoms, batch_atom_types = [], [], []
+        batch_lattices = []
+        for eval_idx in range(num_evals):
+            print(f'batch {idx+1} / {len(loader)}, sample {eval_idx+1} / {num_evals}')
+            outputs, traj = model.sample(batch, step_lr=step_lr, diff_steps = diff_steps)
+            batch_frac_coords.append(outputs['frac_coords'].detach().cpu())
+            batch_num_atoms.append(outputs['num_atoms'].detach().cpu())
+            batch_atom_types.append(outputs['atom_types'].detach().cpu())
+            batch_lattices.append(outputs['lattices'].detach().cpu())
 
-    frac_coords = torch.cat(frac_coords, dim=0)
-    num_atoms = torch.cat(num_atoms, dim=0)
-    atom_types = torch.cat(atom_types, dim=0)
-    lattices = torch.cat(lattices, dim=0)
+        frac_coords.append(torch.stack(batch_frac_coords, dim=0))
+        num_atoms.append(torch.stack(batch_num_atoms, dim=0))
+        atom_types.append(torch.stack(batch_atom_types, dim=0))
+        lattices.append(torch.stack(batch_lattices, dim=0))
+
+        input_data_list = input_data_list + batch.to_data_list()
+
+    frac_coords = torch.cat(frac_coords, dim=1)
+    num_atoms = torch.cat(num_atoms, dim=1)
+    atom_types = torch.cat(atom_types, dim=1)
+    lattices = torch.cat(lattices, dim=1)
     lengths, angles = lattices_to_params_shape(lattices)
-    return (frac_coords, atom_types, lattices, lengths, angles, num_atoms)
+    input_data_batch = Batch.from_data_list(input_data_list)
 
-def display(loader, model, step_lr, diff_steps):
-    frac_coords = []
-    num_atoms = []
-    atom_types = []
-    lattices = []
-    mat_ids = []
-    sam_ids = []
-    for idx, batch in enumerate(loader):
-        if torch.cuda.is_available():
-            batch.cuda()
-        outputs, traj = model.sample(batch, step_lr=step_lr, diff_steps = diff_steps)
-        frac_coords.append(outputs['frac_coords'].detach().cpu())
-        num_atoms.append(outputs['num_atoms'].detach().cpu())
-        atom_types.append(outputs['atom_types'].detach().cpu())
-        lattices.append(outputs['lattices'].detach().cpu())
-        mat_ids.extend(batch.mat_id)
-        sam_ids.append(batch.sam_id)
-
-    frac_coords = torch.cat(frac_coords, dim=0)
-    num_atoms = torch.cat(num_atoms, dim=0)
-    atom_types = torch.cat(atom_types, dim=0)
-    lattices = torch.cat(lattices, dim=0)
-    lengths, angles = lattices_to_params_shape(lattices)
-    sam_ids = torch.cat(sam_ids, dim=0)
-
-    return (frac_coords, atom_types, lattices, lengths, angles, num_atoms, mat_ids, sam_ids)
+    return (frac_coords, atom_types, lattices, lengths, angles, num_atoms, input_data_batch)
 
 
 class SampleDataset(Dataset):
@@ -228,34 +218,6 @@ def main(args):
             'angles': angles,
             'time': time.time() - start_time
         }, model_path / gen_out_name)
-        print('Saving Pt File..Done')
-
-    if 'disp' in args.tasks:
-        print("Inside disp task")
-        disp_dataset = MaterialDispDataset("data/"+str(args.dataset)+"/test.csv", args.num_to_samples)
-        disp_dataloader = DataLoader(disp_dataset, batch_size=args.batch_size, shuffle=True, pin_memory=True)
-        print('Evaluate model on the display task.')
-        start_time = time.time()
-        (frac_coords,  atom_types,_, lengths, angles,num_atoms, mat_ids, sam_ids) = display(disp_dataloader, model, step_lr)
-        print('Generation Time :',time.time() - start_time)
-
-        gen_out_name = 'eval_disp.pt'
-        print('Saving Pt File..')
-        # path = str(model_path) +'/' + str(args.dataset)
-        path = os.path.join(model_path, args.dataset)
-        print(path)
-        if not os.path.exists(path):
-            os.makedirs(path)
-        PATH = path + '/' + gen_out_name
-        torch.save({'frac_coords': frac_coords,
-            'num_atoms': num_atoms,
-            'atom_types': atom_types,
-            'lengths': lengths,
-            'angles': angles,
-            'mat_ids': mat_ids,
-            'sam_ids': sam_ids,
-            'time': time.time() - start_time
-        }, PATH)
         print('Saving Pt File..Done')
 
 
