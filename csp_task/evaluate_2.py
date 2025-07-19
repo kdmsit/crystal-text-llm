@@ -132,9 +132,9 @@ def generation(loader, model, num_evals, step_lr = 1e-5, diff_steps = 1000):
 
 class SampleDataset(Dataset):
 
-    def __init__(self, dataset):
+    def __init__(self, dataset,llm_file_name):
         super().__init__()
-        data = torch.load(f"gen/{dataset}/llm.pt")
+        data = torch.load(f"gen/{dataset}/{llm_file_name}.pt")
         self.frac_coords = data['frac_coords'][0]
         self.atom_types = data['atom_types'][0]
         self.lengths = data['lengths'][0]
@@ -171,7 +171,7 @@ def main(args):
     model_path = Path(args.model_path,args.dataset)
     print("Tasks: ",args.tasks)
 
-    test_set = SampleDataset(args.dataset)
+    test_set = SampleDataset(args.dataset, args.llm_file_name)
     test_dataloader = DataLoader(test_set, batch_size=args.batch_size, shuffle=True, pin_memory=True)
 
     device = config.device
@@ -239,6 +239,7 @@ if __name__ == '__main__':
     parser.add_argument('--step_lr', default=-1, type=float)
     parser.add_argument('--num_evals', default=1, type=int)
     parser.add_argument('--dataset', required=True, type=str, default='perov_5')
+    parser.add_argument('--llm_file_name', required=True, type=str, default='llm_7b')
     parser.add_argument('--timesteps', type=int, default=1000)
     args = parser.parse_args()
     main(args)
