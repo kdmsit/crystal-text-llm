@@ -86,7 +86,7 @@ class CifDataset(Dataset):
 
 
         structure = Structure.from_str(input_dict["cif"], fmt="cif")
-        print(structure)
+        print(structure.composition.pretty_formula)
 
         prompt = "Below is a description of a bulk material. "
         
