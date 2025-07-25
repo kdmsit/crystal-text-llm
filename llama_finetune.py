@@ -86,15 +86,23 @@ class CifDataset(Dataset):
 
 
         structure = Structure.from_str(input_dict["cif"], fmt="cif")
-        print(structure.composition.reduced_formula)
+        pretty_formula = structure.composition.reduced_formula
+        element_symbols = [el.symbol for el in structure.composition.elements]
 
         prompt = "Below is a description of a bulk material. "
         
+        ## MP-20
+        # all_attributes = [
+        #     "formation_energy_per_atom",
+        #     "band_gap",
+        #     "e_above_hull",
+        #     "spacegroup.number",
+        # ]
+
+        ## MPTS-52
         all_attributes = [
             "formation_energy_per_atom",
-            "band_gap",
-            "e_above_hull",
-            "spacegroup.number",
+            "energy_above_hull",
         ]
 
         # sample a random collection of attributes
@@ -108,13 +116,16 @@ class CifDataset(Dataset):
                 "band_gap": "The band gap is",
                 "pretty_formula": "The chemical formula is",
                 "e_above_hull": "The energy above the convex hull is",
+                "energy_above_hull": "The energy above the convex hull is",
                 "elements": "The elements are",
                 "spacegroup.number": "The spacegroup number is",
             }
 
             for attr in attributes:
-                if attr == "elements":
-                    prompt += f"{prompt_lookup[attr]} {', '.join(input_dict[attr])}. "
+                if attr == "pretty_formula":
+                    prompt += f"{prompt_lookup[attr]} {', '.join(pretty_formula)}. "
+                elif attr == "elements":
+                    prompt += f"{prompt_lookup[attr]} {', '.join(element_symbols)}. "
                 elif attr in ["formation_energy_per_atom", "band_gap", "e_above_hull"]:
                     prompt += f"{prompt_lookup[attr]} {round(float(input_dict[attr]), 4)}. "
                 else:
