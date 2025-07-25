@@ -85,7 +85,7 @@ class CifDataset(Dataset):
     def generation_task(self, input_dict):
 
         crystal_str = self.crystal_string(input_dict)
-        structure = Structure.from_str(cif_str, fmt="cif")
+        structure = Structure.from_str(crystal_str, fmt="cif")
         print(structure)
 
         prompt = "Below is a description of a bulk material. "
