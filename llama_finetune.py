@@ -84,6 +84,10 @@ class CifDataset(Dataset):
 
     def generation_task(self, input_dict):
 
+        crystal_str = self.crystal_string(input_dict)
+        structure = Structure.from_str(cif_str, fmt="cif")
+        print(structure)
+
         prompt = "Below is a description of a bulk material. "
         
         all_attributes = [
@@ -121,7 +125,7 @@ class CifDataset(Dataset):
             "and then the element type and coordinates for each atom within the lattice:\n"
         )
 
-        crystal_str = self.crystal_string(input_dict)
+
 
         tokens = self.llama_tokenizer(
             prompt + crystal_str  + self.llama_tokenizer.eos_token,
