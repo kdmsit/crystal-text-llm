@@ -100,9 +100,17 @@ class CifDataset(Dataset):
         # ]
 
         ## MPTS-52
+        # all_attributes = [
+        #     "formation_energy_per_atom",
+        #     "energy_above_hull",
+        # ]
+
+        ## Perov-5
         all_attributes = [
-            "formation_energy_per_atom",
-            "energy_above_hull",
+            "heat_all",
+            "heat_ref",
+            "dir_gap",
+            "ind_gap",
         ]
 
         # sample a random collection of attributes
@@ -119,6 +127,10 @@ class CifDataset(Dataset):
                 "energy_above_hull": "The energy above the convex hull is",
                 "elements": "The elements are",
                 "spacegroup.number": "The spacegroup number is",
+                "heat_all": "The all heat is",
+                "heat_ref": "The ref heat is",
+                "dir_gap": "The direct band gap is",
+                "ind_gap": "The in direct band gap is",
             }
 
             for attr in attributes:
