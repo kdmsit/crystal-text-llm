@@ -282,7 +282,7 @@ class CSPNet(nn.Module):
         lattice_out = self.lattice_out(graph_features)
         lattice_out = lattice_out.view(-1, 3, 3)
         if self.ip:
-            lattice_out = lattice_out.double()
+            # lattice_out = lattice_out.double()
             lattice_out = torch.einsum('bij,bjk->bik', lattice_out, lattices)
         if self.pred_type:
             type_out = self.type_out(node_features)

@@ -456,11 +456,11 @@ if __name__ == "__main__":
         length = length.unsqueeze(0)
         angle = angle.unsqueeze(0)
 
-        print(n_atom.size())
-        print(x_coord.size())
-        print(a_type.size())
-        print(length.size())
-        print(angle.size())
+        # print(n_atom.size())
+        # print(x_coord.size())
+        # print(a_type.size())
+        # print(length.size())
+        # print(angle.size())
 
         path = os.path.join("llm_" + args.dataset + ".pt")
         torch.save({
