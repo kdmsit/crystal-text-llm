@@ -253,19 +253,9 @@ def conditional_sample(args):
         batch = tokenizer(list(batch_prompts), return_tensors="pt")
         batch = {k: v.cuda() for k, v in batch.items()}
 
-        generate_ids = model.generate(
-            **batch,
-            do_sample=True,
-            max_new_tokens=500,
-            temperature=args.temperature, 
-            top_p=args.top_p, 
-        )
+        generate_ids = model.generate(**batch,do_sample=True,max_new_tokens=500,temperature=args.temperature, top_p=args.top_p)
 
-        gen_strs = tokenizer.batch_decode(
-            generate_ids, 
-            skip_special_tokens=True, 
-            clean_up_tokenization_spaces=False
-        )
+        gen_strs = tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)
 
         for gen_str, prompt, _conditions in zip(gen_strs, batch_prompts, batch_conditions):
             material_str = gen_str.replace(prompt, "")
@@ -292,6 +282,9 @@ def conditional_sample(args):
             lengths = torch.tensor(lengths)
             angles = torch.tensor(angles)
 
+            print(n_atom)
+            print(num_atoms)
+            
             n_atom.append(num_atoms)
             x_coord.append(frac_coords)
             a_type.append(atom_types)
