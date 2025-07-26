@@ -225,26 +225,17 @@ condition_templates = {
     "spacegroup.number": "The spacegroup number is {spacegroup.number}. ",
 }
 
-def conditional_sample(args,formula):
-    model, tokenizer = prepare_model_and_tokenizer(args)
-
-    # print(args.conditions_file)
-    # conditions_data = pd.read_csv(args.conditions_file)
-    # print(len(conditions_data))
-
-    conditions_data = pd.read_csv(args.conditions_file)[[args.conditions]].drop_duplicates()
-    conditions_data = conditions_data.sample(args.num_samples, replace=False).to_dict(orient="records")
+def conditional_sample(args,model,tokenizer,formula):
     conditions = args.conditions.split(",")
 
     prompts = []
-    for d in conditions_data:
-        prompt = "Below is a description of a bulk material. "
-        prompt += "The chemical formula is "+str(formula)+". "
-        prompt += (
-            "Generate a description of the lengths and angles of the lattice vectors "
-            "and then the element type and coordinates for each atom within the lattice:\n"
-        )
-        prompts.append(prompt)
+    prompt = "Below is a description of a bulk material. "
+    prompt += "The chemical formula is "+str(formula)+". "
+    prompt += (
+        "Generate a description of the lengths and angles of the lattice vectors "
+        "and then the element type and coordinates for each atom within the lattice:\n"
+    )
+    prompts.append(prompt)
 
     n_atom, x_coord, a_type, length, angle = [], [], [], [], []
     all_data = []
@@ -477,9 +468,10 @@ if __name__ == "__main__":
     print(conditions_data.iloc[0])
 
     if args.conditions_file:
+        model, tokenizer = prepare_model_and_tokenizer(args)
         for index, row in conditions_data.iterrows():
             formula = row["formula"]   #pretty_formula
-            conditional_sample(args,formula)
+            conditional_sample(args,model,tokenizer,formula)
     elif args.infill_file:
         infill_sample(args)
     else:
