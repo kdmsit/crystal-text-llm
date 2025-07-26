@@ -250,7 +250,7 @@ def conditional_sample(args,formula):
     all_data = []
 
 
-    for i in tqdm(range(len(conditions_data))):
+    for i in tqdm(range(1)):
         batch_prompts = prompts[i:i+args.batch_size]
         batch_conditions = conditions[i:i+args.batch_size]
 
