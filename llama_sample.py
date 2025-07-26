@@ -430,8 +430,10 @@ if __name__ == "__main__":
         model, tokenizer = prepare_model_and_tokenizer(args)
         n_atom, x_coord, a_type, length, angle = [], [], [], [], []
         all_data = []
-        for index, row in tqdm(conditions_data.iterrows()):
+        for i in tqdm(range(args.num_samples)):
+        # for index, row in tqdm(conditions_data.iterrows()):
             print("Here - 0/1")
+            row = conditions_data.iloc[i]
             formula = row[args.conditions]   #pretty_formula
             num_atoms,frac_coords, atom_types,lengths,angles,data_dict = conditional_sample(args,model,tokenizer,formula)
             n_atom.append(num_atoms)
