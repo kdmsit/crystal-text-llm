@@ -249,6 +249,8 @@ def conditional_sample(args):
             "and then the element type and coordinates for each atom within the lattice:\n"
         )
         prompts.append(prompt)
+
+    print(prompts)
  
     outputs = []
     while len(outputs) < args.num_samples:
