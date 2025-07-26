@@ -206,7 +206,7 @@ def unconditional_sample(args):
     print(length.size())
     print(angle.size())
 
-    path = os.path.join("llm.pt")
+    path = os.path.join("llm_"+args.dataset+".pt")
     torch.save({
         "frac_coords": x_coord,
         "num_atoms": n_atom,
@@ -406,6 +406,7 @@ def infill_sample(args, start_crystal_cif=None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_name", type=str, required=True)
+    parser.add_argument("--dataset", type=str, required=True)
     parser.add_argument("--model_path", type=str, required=True)
     parser.add_argument("--num_samples", type=int, default=20)
     parser.add_argument("--batch_size", type=int, default=1)
