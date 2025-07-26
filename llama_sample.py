@@ -219,6 +219,7 @@ def unconditional_sample(args):
 
 
 condition_templates = {
+    "formula": "The chemical formula is {pretty_formula}. ",
     "pretty_formula": "The chemical formula is {pretty_formula}. ",
     "e_above_hull": "The energy above the convex hull is {e_above_hull}. ",
     "spacegroup.number": "The spacegroup number is {spacegroup.number}. ",
