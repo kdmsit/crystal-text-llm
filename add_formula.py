@@ -4,7 +4,7 @@ from pymatgen.io.cif import CifParser
 from io import StringIO
 
 # Step 1: Read the input CSV
-input_csv = data/mpts_52/test.csv # Replace with your actual filename
+input_csv = 'data/mpts_52/test.csv' # Replace with your actual filename
 
 df = pd.read_csv(input_csv)
 
@@ -25,5 +25,5 @@ df['pretty_formula'] = df['cif'].apply(get_pretty_formula)
 output_csv = "updated_with_pretty_formula.csv"
 df.to_csv(output_csv, index=False)
 
-output_csv = data/mpts_52/tagged/test.csv
+output_csv = 'data/mpts_52/tagged/test.csv'
 print(f"Saved updated CSV to {output_csv}")
