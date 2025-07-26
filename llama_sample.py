@@ -266,7 +266,7 @@ def conditional_sample(args):
 
         for gen_str, prompt, _conditions in zip(gen_strs, batch_prompts, batch_conditions):
             material_str = gen_str.replace(prompt, "")
-
+            print(prompt)
             try:
                 cif_str = parse_fn(material_str)
                 _ = Structure.from_str(cif_str, fmt="cif") #double check valid cif string
