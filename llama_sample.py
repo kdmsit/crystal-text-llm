@@ -253,7 +253,7 @@ def conditional_sample(args,model,tokenizer,formula):
                 cif_str = parse_fn(material_str)
                 _ = Structure.from_str(cif_str, fmt="cif") #double check valid cif string
             except Exception as e:
-                print(e)
+                print("Exception: ",e)
                 continue
 
             frac_coords, atom_types, lengths, angles, num_atoms, edge_indices, to_jimages = (
