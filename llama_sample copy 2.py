@@ -227,13 +227,9 @@ condition_templates = {
 def conditional_sample(args):
     model, tokenizer = prepare_model_and_tokenizer(args)
 
-    # conditions_data = pd.read_csv(args.conditions_file)[
-    #     ["e_above_hull", "pretty_formula", "spacegroup.number"]
-    # ].drop_duplicates()
-
-    conditions_data = pd.read_csv(args.conditions_file)[["pretty_formula"]].drop_duplicates()
-
-
+    conditions_data = pd.read_csv(args.conditions_file)[
+        ["e_above_hull", "pretty_formula", "spacegroup.number"]
+    ].drop_duplicates()
     conditions_data = conditions_data.sample(args.num_samples, replace=False).to_dict(orient="records")
 
     conditions = args.conditions.split(",")
@@ -406,8 +402,6 @@ def infill_sample(args, start_crystal_cif=None):
     df = pd.DataFrame(outputs)
     df.to_csv(out_path, index=False)
 
-
-# from csp_task.models_ddpm.dataset import MaterialDataset,MaterialDispDataset
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

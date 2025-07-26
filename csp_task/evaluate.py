@@ -47,8 +47,6 @@ def lattices_to_params_shape(lattices):
 
     return lengths, angles
 
-
-
 def reconstructon(loader, model, num_evals, step_lr = 1e-5):
     """
     reconstruct the crystals in <loader>.
@@ -107,7 +105,6 @@ def generation(loader, model, step_lr):
     lattices = torch.cat(lattices, dim=0)
     lengths, angles = lattices_to_params_shape(lattices)
     return (frac_coords, atom_types, lattices, lengths, angles, num_atoms)
-
 
 def display(loader, model, step_lr):
     frac_coords = []
