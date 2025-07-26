@@ -226,16 +226,8 @@ condition_templates = {
 
 def conditional_sample(args):
     model, tokenizer = prepare_model_and_tokenizer(args)
-
-    # conditions_data = pd.read_csv(args.conditions_file)[
-    #     ["e_above_hull", "pretty_formula", "spacegroup.number"]
-    # ].drop_duplicates()
-
     conditions_data = pd.read_csv(args.conditions_file)[["pretty_formula"]].drop_duplicates()
-
-
     conditions_data = conditions_data.sample(args.num_samples, replace=False).to_dict(orient="records")
-
     conditions = args.conditions.split(",")
 
     prompts = []
@@ -250,17 +242,14 @@ def conditional_sample(args):
         )
         prompts.append(prompt)
 
-    print(prompts)
+    # print(prompts)
  
     outputs = []
     while len(outputs) < args.num_samples:
         batch_prompts = prompts[len(outputs):len(outputs)+args.batch_size]
         batch_conditions = conditions[len(outputs):len(outputs)+args.batch_size]
 
-        batch = tokenizer(
-            list(batch_prompts), 
-            return_tensors="pt",
-        )
+        batch = tokenizer(list(batch_prompts), return_tensors="pt")
         batch = {k: v.cuda() for k, v in batch.items()}
 
         generate_ids = model.generate(
@@ -287,16 +276,65 @@ def conditional_sample(args):
                 print(e)
                 continue
 
-            sample = {
-                "gen_str": gen_str,
-                "cif": cif_str,
-                "model_name": args.model_name,
-            }
-            sample.update(_conditions)
-            outputs.append(sample)
+            frac_coords, atom_types, lengths, angles, num_atoms, edge_indices, to_jimages = (
+                process_one(cif_str, True, False, 'crystalnn', False, 0.01))
+            num_atoms = torch.tensor([num_atoms])
+            frac_coords = torch.tensor(frac_coords)
 
-    df = pd.DataFrame(outputs)
-    df.to_csv(out_path, index=False)
+            atom_types = torch.tensor(atom_types)
+            all_valid = ((atom_types >= 0) & (atom_types <= 119)).all().item()
+            if not all_valid:
+                print("Invalid atom types !!")
+                print(atom_types)
+                continue
+
+            lengths = torch.tensor(lengths)
+            angles = torch.tensor(angles)
+
+            n_atom.append(num_atoms)
+            x_coord.append(frac_coords)
+            a_type.append(atom_types)
+            length.append(lengths.view(1, 3))
+            angle.append(angles.view(1, 3))
+            data_dict = {'n_atom': num_atoms,
+                         'x_coord': frac_coords,
+                         'a_type': atom_types,
+                         'length': lengths.view(1, 3),
+                         'angle': angles.view(1, 3),
+                         'edge_indices': edge_indices,
+                         'to_jimages': to_jimages,
+                         }
+            all_data.append(data_dict)
+        pbar.update(1)
+
+        n_atom = torch.cat(n_atom, dim=0)
+        x_coord = torch.cat(x_coord, dim=0)
+        a_type = torch.cat(a_type, dim=0)
+        length = torch.cat(length, dim=0)
+        angle = torch.cat(angle, dim=0)
+
+        n_atom = n_atom.unsqueeze(0)
+        x_coord = x_coord.unsqueeze(0)
+        a_type = a_type.unsqueeze(0)
+        length = length.unsqueeze(0)
+        angle = angle.unsqueeze(0)
+
+        print(n_atom.size())
+        print(x_coord.size())
+        print(a_type.size())
+        print(length.size())
+        print(angle.size())
+
+        path = os.path.join("llm_" + args.dataset + ".pt")
+        torch.save({
+            "frac_coords": x_coord,
+            "num_atoms": n_atom,
+            "atom_types": a_type,
+            "lengths": length,
+            "angles": angle,
+            "data_dict": all_data,
+        }, path)
+        print("Saved to file")
 
 def infill_sample(args, start_crystal_cif=None):
     model, tokenizer = prepare_model_and_tokenizer(args)
