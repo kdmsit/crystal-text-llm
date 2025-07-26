@@ -99,19 +99,19 @@ class CifDataset(Dataset):
         #     "spacegroup.number",
         # ]
 
-        ## MPTS-52
-        # all_attributes = [
-        #     "formation_energy_per_atom",
-        #     "energy_above_hull",
-        # ]
-
-        ## Perov-5
+        # MPTS-52
         all_attributes = [
-            "heat_all",
-            "heat_ref",
-            "dir_gap",
-            "ind_gap",
+            "formation_energy_per_atom",
+            "energy_above_hull",
         ]
+
+        # ## Perov-5
+        # all_attributes = [
+        #     "heat_all",
+        #     "heat_ref",
+        #     "dir_gap",
+        #     "ind_gap",
+        # ]
 
         # sample a random collection of attributes
         num_attributes = random.randint(0, len(all_attributes))
