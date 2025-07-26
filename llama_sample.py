@@ -282,7 +282,7 @@ def conditional_sample(args,model,tokenizer,formula):
                          'to_jimages': to_jimages,
                          }
 
-    return num_atoms,frac_coords, atom_types,lengths,angles,data_dict
+        return num_atoms,frac_coords, atom_types,lengths,angles,data_dict
 
 
 def infill_sample(args, start_crystal_cif=None):
