@@ -22,8 +22,7 @@ def get_pretty_formula(cif_string):
 df['pretty_formula'] = df['cif'].apply(get_pretty_formula)
 
 # Step 4: Save to a new CSV
-output_csv = "updated_with_pretty_formula.csv"
+output_csv = 'data/mpts_52/tagged/test.csv'
 df.to_csv(output_csv, index=False)
 
-output_csv = 'test_tagged.csv'
 print(f"Saved updated CSV to {output_csv}")
