@@ -273,10 +273,6 @@ def conditional_sample(args,model,tokenizer,formula):
             lengths = torch.tensor(lengths)
             angles = torch.tensor(angles)
 
-            # print(n_atom)
-            # print(num_atoms)
-
-
             data_dict = {'n_atom': num_atoms,
                          'x_coord': frac_coords,
                          'a_type': atom_types,
