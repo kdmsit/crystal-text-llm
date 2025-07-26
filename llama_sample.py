@@ -238,7 +238,7 @@ def conditional_sample(args,model,tokenizer,formula):
     prompts.append(prompt)
 
     for i in range(1):
-        print("Here - In")
+        # print("Here - In")
         batch_prompts = prompts[i:i+args.batch_size]
         batch_conditions = conditions[i:i+args.batch_size]
         batch = tokenizer(list(batch_prompts), return_tensors="pt")
@@ -430,9 +430,9 @@ if __name__ == "__main__":
         model, tokenizer = prepare_model_and_tokenizer(args)
         n_atom, x_coord, a_type, length, angle = [], [], [], [], []
         all_data = []
-        for i in tqdm(range(args.num_samples)):
-        # for index, row in tqdm(conditions_data.iterrows()):
-            print("Here - 0/1")
+        # for i in tqdm(range(args.num_samples)):
+        for index, row in tqdm(conditions_data.iterrows(), total=len(conditions_data)):
+            # print("Here - 0/1")
             row = conditions_data.iloc[i]
             formula = row[args.conditions]   #pretty_formula
             num_atoms,frac_coords, atom_types,lengths,angles,data_dict = conditional_sample(args,model,tokenizer,formula)
@@ -442,6 +442,8 @@ if __name__ == "__main__":
             length.append(lengths.view(1, 3))
             angle.append(angles.view(1, 3))
             all_data.append(data_dict)
+            if i > args.num_samples:
+                break
         n_atom = torch.cat(n_atom, dim=0)
         x_coord = torch.cat(x_coord, dim=0)
         a_type = torch.cat(a_type, dim=0)
