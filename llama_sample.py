@@ -442,7 +442,7 @@ if __name__ == "__main__":
             length.append(lengths.view(1, 3))
             angle.append(angles.view(1, 3))
             all_data.append(data_dict)
-            if i > args.num_samples:
+            if index > args.num_samples:
                 break
         n_atom = torch.cat(n_atom, dim=0)
         x_coord = torch.cat(x_coord, dim=0)
