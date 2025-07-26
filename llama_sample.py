@@ -237,11 +237,7 @@ def conditional_sample(args,model,tokenizer,formula):
     )
     prompts.append(prompt)
 
-    n_atom, x_coord, a_type, length, angle = [], [], [], [], []
-    all_data = []
-
-
-    for i in tqdm(range(1)):
+    for i in range(1):
         batch_prompts = prompts[i:i+args.batch_size]
         batch_conditions = conditions[i:i+args.batch_size]
 
@@ -280,11 +276,7 @@ def conditional_sample(args,model,tokenizer,formula):
             # print(n_atom)
             # print(num_atoms)
 
-            n_atom.append(num_atoms)
-            x_coord.append(frac_coords)
-            a_type.append(atom_types)
-            length.append(lengths.view(1, 3))
-            angle.append(angles.view(1, 3))
+
             data_dict = {'n_atom': num_atoms,
                          'x_coord': frac_coords,
                          'a_type': atom_types,
@@ -293,36 +285,9 @@ def conditional_sample(args,model,tokenizer,formula):
                          'edge_indices': edge_indices,
                          'to_jimages': to_jimages,
                          }
-            all_data.append(data_dict)
 
-    n_atom = torch.cat(n_atom, dim=0)
-    x_coord = torch.cat(x_coord, dim=0)
-    a_type = torch.cat(a_type, dim=0)
-    length = torch.cat(length, dim=0)
-    angle = torch.cat(angle, dim=0)
+    return num_atoms,frac_coords, atom_types,lengths,angles,data_dict
 
-    n_atom = n_atom.unsqueeze(0)
-    x_coord = x_coord.unsqueeze(0)
-    a_type = a_type.unsqueeze(0)
-    length = length.unsqueeze(0)
-    angle = angle.unsqueeze(0)
-
-    print(n_atom.size())
-    print(x_coord.size())
-    print(a_type.size())
-    print(length.size())
-    print(angle.size())
-
-    path = os.path.join("llm_" + args.dataset + ".pt")
-    torch.save({
-        "frac_coords": x_coord,
-        "num_atoms": n_atom,
-        "atom_types": a_type,
-        "lengths": length,
-        "angles": angle,
-        "data_dict": all_data,
-    }, path)
-    print("Saved to file")
 
 def infill_sample(args, start_crystal_cif=None):
     model, tokenizer = prepare_model_and_tokenizer(args)
@@ -469,9 +434,45 @@ if __name__ == "__main__":
 
     if args.conditions_file:
         model, tokenizer = prepare_model_and_tokenizer(args)
-        for index, row in conditions_data.iterrows():
+        n_atom, x_coord, a_type, length, angle = [], [], [], [], []
+        all_data = []
+        for index, row in tqdm(conditions_data.iterrows()):
             formula = row["formula"]   #pretty_formula
-            conditional_sample(args,model,tokenizer,formula)
+            num_atoms,frac_coords, atom_types,lengths,angles,data_dict = conditional_sample(args,model,tokenizer,formula)
+            n_atom.append(num_atoms)
+            x_coord.append(frac_coords)
+            a_type.append(atom_types)
+            length.append(lengths.view(1, 3))
+            angle.append(angles.view(1, 3))
+            all_data.append(data_dict)
+        n_atom = torch.cat(n_atom, dim=0)
+        x_coord = torch.cat(x_coord, dim=0)
+        a_type = torch.cat(a_type, dim=0)
+        length = torch.cat(length, dim=0)
+        angle = torch.cat(angle, dim=0)
+
+        n_atom = n_atom.unsqueeze(0)
+        x_coord = x_coord.unsqueeze(0)
+        a_type = a_type.unsqueeze(0)
+        length = length.unsqueeze(0)
+        angle = angle.unsqueeze(0)
+
+        print(n_atom.size())
+        print(x_coord.size())
+        print(a_type.size())
+        print(length.size())
+        print(angle.size())
+
+        path = os.path.join("llm_" + args.dataset + ".pt")
+        torch.save({
+            "frac_coords": x_coord,
+            "num_atoms": n_atom,
+            "atom_types": a_type,
+            "lengths": length,
+            "angles": angle,
+            "data_dict": all_data,
+        }, path)
+        print("Saved to file")
     elif args.infill_file:
         infill_sample(args)
     else:
