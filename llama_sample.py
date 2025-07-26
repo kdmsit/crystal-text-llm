@@ -475,6 +475,10 @@ if __name__ == "__main__":
         out_path = os.path.join(args.out_path, f"samples_{i}.csv") 
         args.out_path = out_path
 
+    conditions_data = pd.read_csv(args.conditions_file)[[args.conditions]].drop_duplicates()
+    print(len(conditions_data))
+    print(conditions_data[0])
+
     if args.conditions_file:
         conditional_sample(args)
     elif args.infill_file:
