@@ -225,7 +225,7 @@ condition_templates = {
     "spacegroup.number": "The spacegroup number is {spacegroup.number}. ",
 }
 
-def conditional_sample(args):
+def conditional_sample(args,formula):
     model, tokenizer = prepare_model_and_tokenizer(args)
 
     # print(args.conditions_file)
@@ -239,16 +239,13 @@ def conditional_sample(args):
     prompts = []
     for d in conditions_data:
         prompt = "Below is a description of a bulk material. "
-        for c in conditions:
-            prompt += condition_templates[c].format(**d)
-
+        prompt += "The chemical formula is "+str(formula)+". "
         prompt += (
             "Generate a description of the lengths and angles of the lattice vectors "
             "and then the element type and coordinates for each atom within the lattice:\n"
         )
         prompts.append(prompt)
 
-    # print(prompts)
     n_atom, x_coord, a_type, length, angle = [], [], [], [], []
     all_data = []
 
@@ -480,7 +477,9 @@ if __name__ == "__main__":
     print(conditions_data.iloc[0])
 
     if args.conditions_file:
-        conditional_sample(args)
+        for index, row in conditions_data.iterrows():
+            formula = row["pretty_formula"]
+            conditional_sample(args,formula)
     elif args.infill_file:
         infill_sample(args)
     else:
