@@ -230,7 +230,7 @@ def conditional_sample(args):
     print(args.conditions_file)
     conditions_data = pd.read_csv(args.conditions_file)
     print(len(conditions_data))
-    
+
     conditions_data = pd.read_csv(args.conditions_file)[["pretty_formula"]].drop_duplicates()
     # conditions_data = pd.read_csv(args.conditions_file)[["pretty_formula"]]
     conditions_data = conditions_data.sample(args.num_samples, replace=False).to_dict(orient="records")

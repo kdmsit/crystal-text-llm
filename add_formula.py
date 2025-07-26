@@ -12,8 +12,7 @@ print(len(df))
 # Step 2: Function to extract pretty_formula from CIF string
 def get_pretty_formula(cif_string):
     try:
-        parser = CifParser(StringIO(cif_string))
-        structure = parser.get_structures(primitive=False)[0]
+        structure = Structure.from_str(cif_string, fmt="cif")
         return structure.composition.reduced_formula
     except Exception as e:
         print(f"Error parsing CIF: {e}")
