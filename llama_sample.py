@@ -227,6 +227,7 @@ condition_templates = {
 
 def conditional_sample(args,model,tokenizer,formula):
     conditions = args.conditions.split(",")
+
     prompts = []
     prompt = "Below is a description of a bulk material. "
     prompt += "The chemical formula is "+str(formula)+". "
@@ -236,47 +237,47 @@ def conditional_sample(args,model,tokenizer,formula):
     )
     prompts.append(prompt)
 
-    batch_prompts = prompts[0]
-    batch_conditions = conditions[0]
+    for i in range(1):
+        batch_prompts = prompts[i:i+args.batch_size]
+        batch_conditions = conditions[i:i+args.batch_size]
+        batch = tokenizer(list(batch_prompts), return_tensors="pt")
+        batch = {k: v.cuda() for k, v in batch.items()}
 
-    batch = tokenizer(list(batch_prompts), return_tensors="pt")
-    batch = {k: v.cuda() for k, v in batch.items()}
+        generate_ids = model.generate(**batch,do_sample=True,max_new_tokens=500,temperature=args.temperature, top_p=args.top_p)
+        gen_strs = tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)
 
-    generate_ids = model.generate(**batch,do_sample=True,max_new_tokens=500,temperature=args.temperature, top_p=args.top_p)
-    gen_strs = tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)
+        for gen_str, prompt, _conditions in zip(gen_strs, batch_prompts, batch_conditions):
+            material_str = gen_str.replace(prompt, "")
+            try:
+                cif_str = parse_fn(material_str)
+                _ = Structure.from_str(cif_str, fmt="cif") #double check valid cif string
+            except Exception as e:
+                print(e)
+                continue
 
-    for gen_str, prompt, _conditions in zip(gen_strs, batch_prompts, batch_conditions):
-        material_str = gen_str.replace(prompt, "")
-        try:
-            cif_str = parse_fn(material_str)
-            _ = Structure.from_str(cif_str, fmt="cif") #double check valid cif string
-        except Exception as e:
-            print(e)
-            continue
+            frac_coords, atom_types, lengths, angles, num_atoms, edge_indices, to_jimages = (
+                process_one(cif_str, True, False, 'crystalnn', False, 0.01))
+            num_atoms = torch.tensor([num_atoms])
+            frac_coords = torch.tensor(frac_coords)
 
-        frac_coords, atom_types, lengths, angles, num_atoms, edge_indices, to_jimages = (
-            process_one(cif_str, True, False, 'crystalnn', False, 0.01))
-        num_atoms = torch.tensor([num_atoms])
-        frac_coords = torch.tensor(frac_coords)
+            atom_types = torch.tensor(atom_types)
+            all_valid = ((atom_types >= 0) & (atom_types <= 119)).all().item()
+            if not all_valid:
+                print("Invalid atom types !!")
+                print(atom_types)
+                continue
 
-        atom_types = torch.tensor(atom_types)
-        all_valid = ((atom_types >= 0) & (atom_types <= 119)).all().item()
-        if not all_valid:
-            print("Invalid atom types !!")
-            print(atom_types)
-            continue
+            lengths = torch.tensor(lengths)
+            angles = torch.tensor(angles)
 
-        lengths = torch.tensor(lengths)
-        angles = torch.tensor(angles)
-
-        data_dict = {'n_atom': num_atoms,
-                     'x_coord': frac_coords,
-                     'a_type': atom_types,
-                     'length': lengths.view(1, 3),
-                     'angle': angles.view(1, 3),
-                     'edge_indices': edge_indices,
-                     'to_jimages': to_jimages,
-                     }
+            data_dict = {'n_atom': num_atoms,
+                         'x_coord': frac_coords,
+                         'a_type': atom_types,
+                         'length': lengths.view(1, 3),
+                         'angle': angles.view(1, 3),
+                         'edge_indices': edge_indices,
+                         'to_jimages': to_jimages,
+                         }
 
     return num_atoms,frac_coords, atom_types,lengths,angles,data_dict
 
