@@ -226,8 +226,9 @@ condition_templates = {
 
 def conditional_sample(args):
     model, tokenizer = prepare_model_and_tokenizer(args)
-    # conditions_data = pd.read_csv(args.conditions_file)[["pretty_formula"]].drop_duplicates()
-    conditions_data = pd.read_csv(args.conditions_file)[["pretty_formula"]]
+    # conditions_data = pd.read_csv(args.conditions_file)
+    conditions_data = pd.read_csv(args.conditions_file)[["pretty_formula"]].drop_duplicates()
+    # conditions_data = pd.read_csv(args.conditions_file)[["pretty_formula"]]
     conditions_data = conditions_data.sample(args.num_samples, replace=False).to_dict(orient="records")
     conditions = args.conditions.split(",")
 
@@ -246,12 +247,11 @@ def conditional_sample(args):
     # print(prompts)
     n_atom, x_coord, a_type, length, angle = [], [], [], [], []
     all_data = []
-    outputs = []
 
     print(len(conditions_data))
-    while len(outputs) < args.num_samples:
-        batch_prompts = prompts[len(outputs):len(outputs)+args.batch_size]
-        batch_conditions = conditions[len(outputs):len(outputs)+args.batch_size]
+    for i in tqdm(range(len(conditions_data))):
+        batch_prompts = prompts[i:i+args.batch_size]
+        batch_conditions = conditions[i:i+args.batch_size]
 
         batch = tokenizer(list(batch_prompts), return_tensors="pt")
         batch = {k: v.cuda() for k, v in batch.items()}
@@ -261,7 +261,6 @@ def conditional_sample(args):
         gen_strs = tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)
 
         for gen_str, prompt, _conditions in zip(gen_strs, batch_prompts, batch_conditions):
-            print("Reach here ->")
             material_str = gen_str.replace(prompt, "")
 
             try:
