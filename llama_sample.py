@@ -258,6 +258,7 @@ def conditional_sample(args):
         gen_strs = tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)
 
         for gen_str, prompt, _conditions in zip(gen_strs, batch_prompts, batch_conditions):
+            print("Reach here ->")
             material_str = gen_str.replace(prompt, "")
 
             try:
@@ -284,7 +285,7 @@ def conditional_sample(args):
 
             print(n_atom)
             print(num_atoms)
-            
+
             n_atom.append(num_atoms)
             x_coord.append(frac_coords)
             a_type.append(atom_types)
