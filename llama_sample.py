@@ -238,6 +238,7 @@ def conditional_sample(args,model,tokenizer,formula):
     prompts.append(prompt)
 
     for i in range(1):
+        print("Here - In")
         batch_prompts = prompts[i:i+args.batch_size]
         batch_conditions = conditions[i:i+args.batch_size]
         batch = tokenizer(list(batch_prompts), return_tensors="pt")
@@ -430,6 +431,7 @@ if __name__ == "__main__":
         n_atom, x_coord, a_type, length, angle = [], [], [], [], []
         all_data = []
         for index, row in tqdm(conditions_data.iterrows()):
+            print("Here - 0/1")
             formula = row[args.conditions]   #pretty_formula
             num_atoms,frac_coords, atom_types,lengths,angles,data_dict = conditional_sample(args,model,tokenizer,formula)
             n_atom.append(num_atoms)
