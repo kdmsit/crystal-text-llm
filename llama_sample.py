@@ -243,7 +243,8 @@ def conditional_sample(args):
         prompts.append(prompt)
 
     # print(prompts)
- 
+    n_atom, x_coord, a_type, length, angle = [], [], [], [], []
+    all_data = []
     outputs = []
     while len(outputs) < args.num_samples:
         batch_prompts = prompts[len(outputs):len(outputs)+args.batch_size]
