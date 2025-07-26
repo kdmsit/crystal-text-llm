@@ -227,7 +227,6 @@ condition_templates = {
 
 def conditional_sample(args,model,tokenizer,formula):
     conditions = args.conditions.split(",")
-
     prompts = []
     prompt = "Below is a description of a bulk material. "
     prompt += "The chemical formula is "+str(formula)+". "
@@ -236,53 +235,48 @@ def conditional_sample(args,model,tokenizer,formula):
         "and then the element type and coordinates for each atom within the lattice:\n"
     )
     prompts.append(prompt)
+    batch_prompts = prompts[0]
+    batch_conditions = conditions[0]
 
-    for i in range(1):
-        batch_prompts = prompts[i:i+args.batch_size]
-        batch_conditions = conditions[i:i+args.batch_size]
+    batch = tokenizer(list(batch_prompts), return_tensors="pt")
+    batch = {k: v.cuda() for k, v in batch.items()}
+    generate_ids = model.generate(**batch,do_sample=True,max_new_tokens=500,temperature=args.temperature, top_p=args.top_p)
+    gen_strs = tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)
 
-        batch = tokenizer(list(batch_prompts), return_tensors="pt")
-        batch = {k: v.cuda() for k, v in batch.items()}
+    for gen_str, prompt, _conditions in zip(gen_strs, batch_prompts, batch_conditions):
+        material_str = gen_str.replace(prompt, "")
+        try:
+            cif_str = parse_fn(material_str)
+            _ = Structure.from_str(cif_str, fmt="cif") #double check valid cif string
+        except Exception as e:
+            print(e)
+            continue
 
-        generate_ids = model.generate(**batch,do_sample=True,max_new_tokens=500,temperature=args.temperature, top_p=args.top_p)
+        frac_coords, atom_types, lengths, angles, num_atom, edge_indices, to_jimages = (
+            process_one(cif_str, True, False, 'crystalnn', False, 0.01))
+        num_atom = torch.tensor([num_atom])
+        frac_coords = torch.tensor(frac_coords)
 
-        gen_strs = tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)
+        atom_types = torch.tensor(atom_types)
+        all_valid = ((atom_types >= 0) & (atom_types <= 119)).all().item()
+        if not all_valid:
+            print("Invalid atom types !!")
+            print(atom_types)
+            continue
 
-        for gen_str, prompt, _conditions in zip(gen_strs, batch_prompts, batch_conditions):
-            material_str = gen_str.replace(prompt, "")
-            # print(prompt)
-            try:
-                cif_str = parse_fn(material_str)
-                _ = Structure.from_str(cif_str, fmt="cif") #double check valid cif string
-            except Exception as e:
-                print(e)
-                continue
+        lengths = torch.tensor(lengths)
+        angles = torch.tensor(angles)
 
-            frac_coords, atom_types, lengths, angles, num_atoms, edge_indices, to_jimages = (
-                process_one(cif_str, True, False, 'crystalnn', False, 0.01))
-            num_atoms = torch.tensor([num_atoms])
-            frac_coords = torch.tensor(frac_coords)
+        data_dict = {'n_atom': num_atom,
+                     'x_coord': frac_coords,
+                     'a_type': atom_types,
+                     'length': lengths.view(1, 3),
+                     'angle': angles.view(1, 3),
+                     'edge_indices': edge_indices,
+                     'to_jimages': to_jimages,
+                     }
 
-            atom_types = torch.tensor(atom_types)
-            all_valid = ((atom_types >= 0) & (atom_types <= 119)).all().item()
-            if not all_valid:
-                print("Invalid atom types !!")
-                print(atom_types)
-                continue
-
-            lengths = torch.tensor(lengths)
-            angles = torch.tensor(angles)
-
-            data_dict = {'n_atom': num_atoms,
-                         'x_coord': frac_coords,
-                         'a_type': atom_types,
-                         'length': lengths.view(1, 3),
-                         'angle': angles.view(1, 3),
-                         'edge_indices': edge_indices,
-                         'to_jimages': to_jimages,
-                         }
-
-        return num_atoms,frac_coords, atom_types,lengths,angles,data_dict
+    return num_atom,frac_coords, atom_types,lengths,angles,data_dict
 
 
 def infill_sample(args, start_crystal_cif=None):
@@ -434,8 +428,8 @@ if __name__ == "__main__":
         all_data = []
         for index, row in tqdm(conditions_data.iterrows()):
             formula = row[args.conditions]   #pretty_formula
-            num_atoms,frac_coords, atom_types,lengths,angles,data_dict = conditional_sample(args,model,tokenizer,formula)
-            n_atom.append(num_atoms)
+            num_atom,frac_coords, atom_types,lengths,angles,data_dict = conditional_sample(args,model,tokenizer,formula)
+            n_atom.append(num_atom)
             x_coord.append(frac_coords)
             a_type.append(atom_types)
             length.append(lengths.view(1, 3))
