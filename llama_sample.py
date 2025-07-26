@@ -478,7 +478,7 @@ if __name__ == "__main__":
 
     if args.conditions_file:
         for index, row in conditions_data.iterrows():
-            formula = row["pretty_formula"]
+            formula = row["formula"]   #pretty_formula
             conditional_sample(args,formula)
     elif args.infill_file:
         infill_sample(args)
