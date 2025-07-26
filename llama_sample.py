@@ -437,7 +437,7 @@ if __name__ == "__main__":
         n_atom, x_coord, a_type, length, angle = [], [], [], [], []
         all_data = []
         for index, row in tqdm(conditions_data.iterrows()):
-            formula = row["formula"]   #pretty_formula
+            formula = row[args.conditions]   #pretty_formula
             num_atoms,frac_coords, atom_types,lengths,angles,data_dict = conditional_sample(args,model,tokenizer,formula)
             n_atom.append(num_atoms)
             x_coord.append(frac_coords)
