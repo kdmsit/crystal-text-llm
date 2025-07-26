@@ -246,6 +246,8 @@ def conditional_sample(args):
     n_atom, x_coord, a_type, length, angle = [], [], [], [], []
     all_data = []
     outputs = []
+
+    print(len(conditions_data))
     while len(outputs) < args.num_samples:
         batch_prompts = prompts[len(outputs):len(outputs)+args.batch_size]
         batch_conditions = conditions[len(outputs):len(outputs)+args.batch_size]
@@ -283,8 +285,8 @@ def conditional_sample(args):
             lengths = torch.tensor(lengths)
             angles = torch.tensor(angles)
 
-            print(n_atom)
-            print(num_atoms)
+            # print(n_atom)
+            # print(num_atoms)
 
             n_atom.append(num_atoms)
             x_coord.append(frac_coords)
