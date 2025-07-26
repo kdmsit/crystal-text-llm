@@ -235,11 +235,13 @@ def conditional_sample(args,model,tokenizer,formula):
         "and then the element type and coordinates for each atom within the lattice:\n"
     )
     prompts.append(prompt)
+
     batch_prompts = prompts[0]
     batch_conditions = conditions[0]
 
     batch = tokenizer(list(batch_prompts), return_tensors="pt")
     batch = {k: v.cuda() for k, v in batch.items()}
+
     generate_ids = model.generate(**batch,do_sample=True,max_new_tokens=500,temperature=args.temperature, top_p=args.top_p)
     gen_strs = tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)
 
@@ -252,9 +254,9 @@ def conditional_sample(args,model,tokenizer,formula):
             print(e)
             continue
 
-        frac_coords, atom_types, lengths, angles, num_atom, edge_indices, to_jimages = (
+        frac_coords, atom_types, lengths, angles, num_atoms, edge_indices, to_jimages = (
             process_one(cif_str, True, False, 'crystalnn', False, 0.01))
-        num_atom = torch.tensor([num_atom])
+        num_atoms = torch.tensor([num_atoms])
         frac_coords = torch.tensor(frac_coords)
 
         atom_types = torch.tensor(atom_types)
@@ -267,7 +269,7 @@ def conditional_sample(args,model,tokenizer,formula):
         lengths = torch.tensor(lengths)
         angles = torch.tensor(angles)
 
-        data_dict = {'n_atom': num_atom,
+        data_dict = {'n_atom': num_atoms,
                      'x_coord': frac_coords,
                      'a_type': atom_types,
                      'length': lengths.view(1, 3),
@@ -276,7 +278,7 @@ def conditional_sample(args,model,tokenizer,formula):
                      'to_jimages': to_jimages,
                      }
 
-    return num_atom,frac_coords, atom_types,lengths,angles,data_dict
+    return num_atoms,frac_coords, atom_types,lengths,angles,data_dict
 
 
 def infill_sample(args, start_crystal_cif=None):
@@ -428,8 +430,8 @@ if __name__ == "__main__":
         all_data = []
         for index, row in tqdm(conditions_data.iterrows()):
             formula = row[args.conditions]   #pretty_formula
-            num_atom,frac_coords, atom_types,lengths,angles,data_dict = conditional_sample(args,model,tokenizer,formula)
-            n_atom.append(num_atom)
+            num_atoms,frac_coords, atom_types,lengths,angles,data_dict = conditional_sample(args,model,tokenizer,formula)
+            n_atom.append(num_atoms)
             x_coord.append(frac_coords)
             a_type.append(atom_types)
             length.append(lengths.view(1, 3))
