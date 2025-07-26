@@ -7,6 +7,7 @@ from io import StringIO
 input_csv = 'data/mpts_52/test.csv' # Replace with your actual filename
 
 df = pd.read_csv(input_csv)
+print(len(df))
 
 # Step 2: Function to extract pretty_formula from CIF string
 def get_pretty_formula(cif_string):
@@ -20,9 +21,9 @@ def get_pretty_formula(cif_string):
 
 # Step 3: Generate pretty_formula for each row
 df['pretty_formula'] = df['cif'].apply(get_pretty_formula)
-
+print(len(df))
 # Step 4: Save to a new CSV
-output_csv = 'data/mpts_52/tagged/test.csv'
+output_csv = 'data/mpts_52/tagged/test_new.csv'
 df.to_csv(output_csv, index=False)
 
 print(f"Saved updated CSV to {output_csv}")
