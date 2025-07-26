@@ -306,7 +306,6 @@ def conditional_sample(args):
                          'to_jimages': to_jimages,
                          }
             all_data.append(data_dict)
-        pbar.update(1)
 
         n_atom = torch.cat(n_atom, dim=0)
         x_coord = torch.cat(x_coord, dim=0)
