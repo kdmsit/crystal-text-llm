@@ -74,6 +74,7 @@ def reconstructon(loader, model, num_evals, step_lr = 1e-5):
         atom_types.append(torch.stack(batch_atom_types, dim=0))
         lattices.append(torch.stack(batch_lattices, dim=0))
 
+        # print(batch.to_data_list())
         input_data_list = input_data_list + batch.to_data_list()
 
     frac_coords = torch.cat(frac_coords, dim=1)

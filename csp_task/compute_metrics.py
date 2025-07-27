@@ -330,13 +330,9 @@ def main(args):
                 print(f"Processing batch {i}/ {len(crys_array_list)}")
                 pred_crys.append(p_map(lambda x: Crystal(x), crys_array_list[i]))
 
-        gt_crys = p_map(lambda x: Crystal(x), true_crystal_array_list)
-
-        # print("Save the generated Images...")
-        # for i in range(len(pred_crys)):
-        #     crystal = pred_crys[i]
-        #     crystal.structure.to(filename='generated/' + str(i) + ".cif")
-        # print("Saved the generated Images...[DONE]")
+        # gt_crys = p_map(lambda x: Crystal(x), true_crystal_array_list)
+        csv = pd.read_csv(args.gt_file)
+        gt_crys = p_map(get_gt_crys_ori, csv['cif'])
 
         if args.multi_eval:
             rec_evaluator = RecEvalBatch(pred_crys, gt_crys)
@@ -368,6 +364,7 @@ if __name__ == '__main__':
     parser.add_argument('--label', default='')
     parser.add_argument('--tasks', nargs='+', default=['recon', 'gen', 'opt'])
     parser.add_argument('--multi_eval', action='store_true')
+    parser.add_argument('--gt_file', default='')
     parser.add_argument('--eval_model_name', required=True, type=str, default='perovskite')
     args = parser.parse_args()
     main(args)
