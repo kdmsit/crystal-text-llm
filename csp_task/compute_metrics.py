@@ -309,7 +309,16 @@ def get_crystal_array_list(file_path, batch_idx=0):
 
     return crys_array_list, true_crystal_array_list
 
-
+def get_gt_crys_ori(cif):
+    structure = Structure.from_str(cif,fmt='cif')
+    lattice = structure.lattice
+    crys_array_dict = {
+        'frac_coords':structure.frac_coords,
+        'atom_types':np.array([_.Z for _ in structure.species]),
+        'lengths': np.array(lattice.abc),
+        'angles': np.array(lattice.angles)
+    }
+    return Crystal(crys_array_dict)
 
 def main(args):
     all_metrics = {}
