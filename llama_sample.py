@@ -19,6 +19,10 @@ from llama_finetune import get_crystal_string, MAX_LENGTH
 from templating import make_swap_table
 from data_utils import process_one
 from tqdm import tqdm
+from torch_geometric.data import Batch
+
+
+
 DEFAULT_PAD_TOKEN = "[PAD]"
 DEFAULT_EOS_TOKEN = "</s>"
 DEFAULT_BOS_TOKEN = "<s>"
@@ -225,9 +229,21 @@ condition_templates = {
     "spacegroup.number": "The spacegroup number is {spacegroup.number}. ",
 }
 
-def conditional_sample(args,model,tokenizer,formula):
-    conditions = args.conditions.split(",")
+def conditional_sample(args,model,tokenizer,formula,cif_str):
 
+    frac_coords, atom_types, lengths, angles, num_atoms, edge_indices, to_jimages = (
+        process_one(cif_str, True, False, 'crystalnn', False, 0.01))
+
+    input_data = Data(
+            frac_coords=torch.Tensor(frac_coords),
+            atom_types=torch.LongTensor(atom_types),
+            lengths=torch.Tensor(lengths).view(1, -1),
+            angles=torch.Tensor(angles).view(1, -1),
+            num_atoms=num_atoms,
+        )
+
+
+    conditions = args.conditions.split(",")
     prompts = []
     prompt = "Below is a description of a bulk material. "
     prompt += "The chemical formula is "+str(formula)+". "
@@ -280,7 +296,7 @@ def conditional_sample(args,model,tokenizer,formula):
                          'to_jimages': to_jimages,
                          }
 
-    return num_atoms,frac_coords, atom_types,lengths,angles,data_dict
+    return num_atoms,frac_coords, atom_types,lengths,angles,data_dict,input_data
 
 
 def infill_sample(args, start_crystal_cif=None):
@@ -430,18 +446,21 @@ if __name__ == "__main__":
         model, tokenizer = prepare_model_and_tokenizer(args)
         n_atom, x_coord, a_type, length, angle = [], [], [], [], []
         all_data = []
+        input_data_list = []
         # for i in tqdm(range(args.num_samples)):
         for index, row in tqdm(conditions_data.iterrows(), total=len(conditions_data)):
             # print("Here - 0/1")
             # row = conditions_data.iloc[i]
             formula = row[args.conditions]   #pretty_formula
-            num_atoms,frac_coords, atom_types,lengths,angles,data_dict = conditional_sample(args,model,tokenizer,formula)
+            cif_str = row["cif"]
+            num_atoms,frac_coords, atom_types,lengths,angles,data_dict,input_data = conditional_sample(args,model,tokenizer,formula,cif_str)
             n_atom.append(num_atoms)
             x_coord.append(frac_coords)
             a_type.append(atom_types)
             length.append(lengths.view(1, 3))
             angle.append(angles.view(1, 3))
             all_data.append(data_dict)
+            input_data_list = input_data_list + input_data
             if index > args.num_samples:
                 break
         n_atom = torch.cat(n_atom, dim=0)
@@ -455,15 +474,15 @@ if __name__ == "__main__":
         a_type = a_type.unsqueeze(0)
         length = length.unsqueeze(0)
         angle = angle.unsqueeze(0)
-
+        input_data_batch = Batch.from_data_list(input_data_list)
         # print(n_atom.size())
         # print(x_coord.size())
         # print(a_type.size())
         # print(length.size())
         # print(angle.size())
 
-        path = os.path.join("llm_" + args.dataset + ".pt")
-        torch.save({
+        path = os.path.join("llm_csp_" + args.dataset + ".pt")
+        torch.save({'input_data_batch': input_data_batch,
             "frac_coords": x_coord,
             "num_atoms": n_atom,
             "atom_types": a_type,

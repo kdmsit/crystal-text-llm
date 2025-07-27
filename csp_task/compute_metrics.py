@@ -297,13 +297,11 @@ def get_crystal_array_list(file_path, batch_idx=0):
     if 'input_data_batch' in data:
         batch = data['input_data_batch']
         if isinstance(batch, dict):
-            true_crystal_array_list = get_crystals_list(
-                batch['frac_coords'], batch['atom_types'], batch['lengths'],
-                batch['angles'], batch['num_atoms'])
+            true_crystal_array_list = get_crystals_list(batch['frac_coords'], batch['atom_types'],
+                                                        batch['lengths'], batch['angles'], batch['num_atoms'])
         else:
-            true_crystal_array_list = get_crystals_list(
-                batch.frac_coords, batch.atom_types, batch.lengths,
-                batch.angles, batch.num_atoms)
+            true_crystal_array_list = get_crystals_list(batch.frac_coords, batch.atom_types,
+                                                        batch.lengths, batch.angles, batch.num_atoms)
     else:
         true_crystal_array_list = None
 
