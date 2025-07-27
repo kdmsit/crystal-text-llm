@@ -441,7 +441,7 @@ if __name__ == "__main__":
     print(args.conditions)
     conditions_columns = args.conditions.split(",")
     print(conditions_columns)
-    print(args.conditions_file.columns)
+    print(pd.read_csv(args.conditions_file).columns)
 
     conditions_data = pd.read_csv(args.conditions_file)[[conditions_columns]].drop_duplicates()
     print(len(conditions_data))
