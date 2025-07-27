@@ -8,7 +8,7 @@ from pathlib import Path
 from tqdm import tqdm
 from p_tqdm import p_map
 from scipy.stats import wasserstein_distance
-
+import pandas as pd
 from pymatgen.core.structure import Structure
 from pymatgen.core.composition import Composition
 from pymatgen.core.lattice import Lattice
