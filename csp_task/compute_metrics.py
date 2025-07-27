@@ -313,6 +313,7 @@ def get_crystal_array_list(file_path, batch_idx=0):
 
 def main(args):
     all_metrics = {}
+    print(args.eval_model_name)
     eval_model_name = args.eval_model_name
 
     if 'recon' in args.tasks:
