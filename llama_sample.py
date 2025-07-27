@@ -460,7 +460,7 @@ if __name__ == "__main__":
         for index, row in tqdm(conditions_data.iterrows(), total=len(conditions_data)):
             # print("Here - 0/1")
             # row = conditions_data.iloc[i]
-            formula = row[args.conditions]   #pretty_formula
+            formula = row[conditions_columns[0]]   #pretty_formula
             cif_str = row["cif"]
             num_atoms,frac_coords, atom_types,lengths,angles,data_dict,input_data = conditional_sample(args,model,tokenizer,formula,cif_str)
             n_atom.append(num_atoms)
