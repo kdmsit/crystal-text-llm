@@ -424,7 +424,7 @@ if __name__ == "__main__":
     parser.add_argument("--top_p", type=float, default=0.9)
     parser.add_argument("--format_instruction_prompt", type=int, default=0)
     parser.add_argument("--format_response_format", type=int, default=0)
-    parser.add_argument("--conditions", type=str, default="pretty_formula")
+    parser.add_argument("--conditions", type=str, default="pretty_formula,cif")
     parser.add_argument("--conditions_file", type=str, default="") #"data/with_tags/test.csv"
     parser.add_argument("--infill_file", type=str, default="") #"data/with_tags/test.csv"
     parser.add_argument("--infill_do_constraint", type=int, default=0)
