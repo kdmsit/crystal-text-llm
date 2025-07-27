@@ -61,6 +61,7 @@ def reconstructon(loader, model, num_evals, step_lr = 1e-5):
             batch.cuda()
         batch_frac_coords, batch_num_atoms, batch_atom_types = [], [], []
         batch_lattices = []
+        print(batch.to_data_list())
         for eval_idx in range(num_evals):
             print(f'batch {idx+1} / {len(loader)}, sample {eval_idx+1} / {num_evals}')
             outputs, traj = model.sample(batch, step_lr=step_lr)
@@ -74,7 +75,7 @@ def reconstructon(loader, model, num_evals, step_lr = 1e-5):
         atom_types.append(torch.stack(batch_atom_types, dim=0))
         lattices.append(torch.stack(batch_lattices, dim=0))
 
-        print(batch.to_data_list())
+
         input_data_list = input_data_list + batch.to_data_list()
 
     frac_coords = torch.cat(frac_coords, dim=1)
