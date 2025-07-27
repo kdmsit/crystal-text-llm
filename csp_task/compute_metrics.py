@@ -324,7 +324,8 @@ def main(args):
     eval_model_name = args.eval_model_name
 
     if 'recon' in args.tasks:
-        recon_file_path = get_file_paths(args.root_path, 'recon', args.label)
+        # recon_file_path = get_file_paths(args.root_path, 'recon', args.label)
+        recon_file_path = args.root_path
         print(recon_file_path)
         batch_idx = -1 if args.multi_eval else 0
         crys_array_list, true_crystal_array_list = get_crystal_array_list(recon_file_path,batch_idx)
