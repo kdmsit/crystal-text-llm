@@ -338,9 +338,9 @@ def main(args):
                 print(f"Processing batch {i}/ {len(crys_array_list)}")
                 pred_crys.append(p_map(lambda x: Crystal(x), crys_array_list[i]))
 
-        # gt_crys = p_map(lambda x: Crystal(x), true_crystal_array_list)
-        csv = pd.read_csv(args.gt_file)
-        gt_crys = p_map(get_gt_crys_ori, csv['cif'])
+        gt_crys = p_map(lambda x: Crystal(x), true_crystal_array_list)
+        # csv = pd.read_csv(args.gt_file)
+        # gt_crys = p_map(get_gt_crys_ori, csv['cif'])
 
         if args.multi_eval:
             rec_evaluator = RecEvalBatch(pred_crys, gt_crys)
