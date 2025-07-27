@@ -443,7 +443,7 @@ if __name__ == "__main__":
     print(conditions_columns)
     print(pd.read_csv(args.conditions_file).columns)
 
-    conditions_data = pd.read_csv(args.conditions_file)[[conditions_columns]].drop_duplicates()
+    conditions_data = pd.read_csv(args.conditions_file)[conditions_columns].drop_duplicates()
     print(len(conditions_data))
     print(conditions_data.iloc[0])
 
