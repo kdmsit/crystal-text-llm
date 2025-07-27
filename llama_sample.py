@@ -19,7 +19,7 @@ from llama_finetune import get_crystal_string, MAX_LENGTH
 from templating import make_swap_table
 from data_utils import process_one
 from tqdm import tqdm
-from torch_geometric.data import Batch
+from torch_geometric.data import Batch,Data
 
 
 
