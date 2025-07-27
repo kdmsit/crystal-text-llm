@@ -313,7 +313,7 @@ def get_crystal_array_list(file_path, batch_idx=0):
 
 def main(args):
     all_metrics = {}
-    eval_model_name = "perovskite"
+    eval_model_name = args.eval_model_name
 
     if 'recon' in args.tasks:
         recon_file_path = get_file_paths(args.root_path, 'recon', args.label)
@@ -367,6 +367,7 @@ if __name__ == '__main__':
     parser.add_argument('--label', default='')
     parser.add_argument('--tasks', nargs='+', default=['recon', 'gen', 'opt'])
     parser.add_argument('--multi_eval', action='store_true')
+    parser.add_argument('--eval_model_name', required=True, type=str, default='perovskite')
     args = parser.parse_args()
     main(args)
     # main('gen/','','recon')
