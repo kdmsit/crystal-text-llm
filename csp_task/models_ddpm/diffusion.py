@@ -88,13 +88,14 @@ class CSPDiffusion(nn.Module):
 
     @torch.no_grad()
     def sample(self, batch, step_lr = 1e-5,diff_steps = 1000):
-
         batch_size = batch.num_graphs
 
-        x_T= batch.frac_coords
-        l_T = lattice_params_to_matrix_torch(batch.lengths, batch.angles)
+        # CrysLLMGen
+        # x_T= batch.frac_coords
+        # l_T = lattice_params_to_matrix_torch(batch.lengths, batch.angles)
 
-        # l_T, x_T = torch.randn([batch_size, 3, 3]).to(self.device), torch.rand([batch.num_nodes, 3]).to(self.device)
+        # CSP Task
+        l_T, x_T = torch.randn([batch_size, 3, 3]).to(self.device), torch.rand([batch.num_nodes, 3]).to(self.device)
 
         if self.keep_coords:
             x_T = batch.frac_coords
