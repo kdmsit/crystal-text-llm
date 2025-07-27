@@ -266,14 +266,15 @@ def conditional_sample(args,model,tokenizer,formula,cif_str):
         for gen_str, prompt, _conditions in zip(gen_strs, batch_prompts, batch_conditions):
             material_str = gen_str.replace(prompt, "")
             try:
-                cif_str = parse_fn(material_str)
-                _ = Structure.from_str(cif_str, fmt="cif") #double check valid cif string
+                # cif_str = parse_fn(material_str)
+                # _ = Structure.from_str(cif_str, fmt="cif") #double check valid cif string
+                frac_coords, atom_types, lengths, angles, num_atoms, edge_indices, to_jimages = (
+                    process_one(cif_str, True, False, 'crystalnn', False, 0.01))
             except Exception as e:
                 print("Exception: ",e)
                 continue
 
-            frac_coords, atom_types, lengths, angles, num_atoms, edge_indices, to_jimages = (
-                process_one(cif_str, True, False, 'crystalnn', False, 0.01))
+
             num_atoms = torch.tensor([num_atoms])
             frac_coords = torch.tensor(frac_coords)
 
@@ -446,7 +447,6 @@ if __name__ == "__main__":
     conditions_data = pd.read_csv(args.conditions_file)[conditions_columns].drop_duplicates()
     print(len(conditions_data))
     print(conditions_data.iloc[0])
-
 
 
     if args.conditions_file:
