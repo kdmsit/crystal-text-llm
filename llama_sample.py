@@ -455,7 +455,8 @@ if __name__ == "__main__":
         all_data = []
         input_data_list = []
 
-        print("Columns:",conditions_data.columns)
+        print("Total Data >>",len(conditions_data))
+        # print("Columns:",conditions_data.columns)
         # for i in tqdm(range(args.num_samples)):
         for index, row in tqdm(conditions_data.iterrows(), total=len(conditions_data)):
             # print("Here - 0/1")
