@@ -17,6 +17,6 @@
 source /home/rs1/21CS92R01/miniconda3/bin/activate crystal-llm
 
 
-#python3 -W ignore  train_ae.py --dataset mp_20 --lat_dim 64 --epochs 1000 --batch_size 256
+python -W ignore llama_finetune.py --run-name 7b-mpts --model 7b --num-epochs 1 --data-path data/mpts_52
 
 
