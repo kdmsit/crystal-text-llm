@@ -136,7 +136,7 @@ class RecEval(object):
         match_rate = sum(rms_dists != None) / len(self.preds)
         mean_rms_dist = rms_dists[rms_dists != None].mean()
         return {'match_rate': round(match_rate*100,4),
-                'rms_dist': round(mean_rms_dist,4)}
+                'rms_dist': mean_rms_dist}
 
     def get_metrics(self):
         return self.get_match_rate_and_rms()
